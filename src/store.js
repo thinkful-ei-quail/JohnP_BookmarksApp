@@ -10,29 +10,13 @@
 // const BASE_URL = `https://thinkful-list-api.herokuapp.com/johnpendergast/bookmarks`;
 
 
-const store = {
-    bookmarks: [
-      {
-        id: 'x56w',
-        title: 'Title 1',
-        rating: 3,
-        url: 'http://www.title1.com',
-        description: 'lorem ipsum dolor sit',
-        expanded: false
-      },
-      {
-        id: '6ffw',
-        title: 'Title 2',
-        rating: 5,
-        url: 'http://www.title2.com',
-        description: 'dolorum tempore deserunt',
-        expanded: false
-      }
+const  bookmarks = [];
 
-    ],
-    adding: false,
-    error: null,
-    filter: 0
+  const state ={
+      adding:false,
+      error: null,
+      filter:0,
+      BASE_URL:'https://thinkful-list-api.herokuapp.com/johnp/bookmarks/'
   };
 
 
@@ -40,20 +24,42 @@ const store = {
 
 
 
-//const findById = function (id) {
-//     return this.items.find(currentItem => currentItem.id === id);
-// };
 
 ///funcitons for finding things by id ie addBook
-///func removeBook
-///upddate ratings
-///filterByRating
 
-///seterror
-
+const findBookmarkById = function (id) {
+    return this.items.find(bkmk => bkmk.id === id)
+};
 
 
+const addNewBook = function (bookmark) {
+ this.bookmarks.push(bookmark);
+};
+
+const findAndDeleteBook = function (id, bookmarks){
+    this.bookmarks=this.bookmarks.filter(bkmk => bkmk.id !== id);
+};
+
+
+const findAndEdit = function (id, newData){
+    const found = this.findBookmarkById(id);
+    Object.assign(found, newData)
+};
+
+const setError = function (error){
+    this.error=error;
+};
+
+///filterByRating////////////////////
+//////////////////////////////////
+/////////////////////////
 
 
 
-///export default {};
+
+
+
+export default {
+    state,
+    bookmarks
+};

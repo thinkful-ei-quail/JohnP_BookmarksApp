@@ -50,7 +50,7 @@ const generateListItem= function (bookmarks){
         `
     };
 
-    generateExpandedBook = function (){
+   const generateExpandedBook = function (){
         return `
     <div class="xpanded">
         <div>
@@ -77,7 +77,42 @@ const generateListItem= function (bookmarks){
         `
     };
 
-
+    const generateAddBookmark = function (){
+        $('.addform').html(`
+        <div class="add-form-container">
+            <form id="add-bookmark-form">
+                <div class="addform">
+                    <label for="bookmark-title">Add New Site</label>
+                    <input type="text" name="bookmark-title" class="bookmark-title new-site-name"
+                    placeholder="Enter Site Name" required>
+                </div>
+                <div class="addform">
+                  <label for="bookmark-url">URL ('https://' is required)</label>
+                  <input type="url" name="bookmark-url" class="form-control new-site-url" placeholder="http(s)://"
+                  required>
+                </div>
+                <div class="addform">
+                   <label for="bookmark-description">Description</label>
+                    <input type="text" name="bookmark-description" class="form-control new-site-desc"
+                    placeholder="Enter a description..." required>
+                </div>
+                <div class="rate-new">
+                  <label for="rating">Rating</label>
+                  <select name="rating" class="new-site-rating">
+                       <option value="1">1-Star</option>
+                       <option value="2">2-Stars</option>
+                       <option value="3">3-Stars</option>
+                       <option value="4">4-Stars</option>
+                      <option value="5">5-Stars</option>
+                  </select>
+                </div>
+                <div class="new-site-submit">
+                    <button type="submit" class="add-bookmark">Save</button>
+                </div>
+            </form>
+        </div>
+        `);
+    };
 
 
 //////////////////Render Funcs
