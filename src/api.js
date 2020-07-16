@@ -34,7 +34,9 @@ const addNewBookmark = function (name, address, descr, num ) {
     num=parseInt(num);
     if(num === null){
     num = 0;}
+    else{num = 5};
     const newBookmark=JSON.stringify({title:name,url:address,desc:descr,rating:num})
+    console.log(newBookmark);
      return fetchViaAsyncAwait(`${store.state.BASE_URL}`, {
         method : 'POST',
         headers:{
