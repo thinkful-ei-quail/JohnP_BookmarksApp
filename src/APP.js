@@ -4,6 +4,9 @@
 
 
 
+import api from './api';
+import store from './store';
+import APP from './APP';
 
 ///////////////////////////////////MU GENERATOR FUNCS//
 
@@ -12,6 +15,7 @@
 const generateStart = function (){
     $('main').html(`
     <section class="display-container">
+    <div class="error-container">Error Will Be Here</div>
     <section><div class="add-new"><button class="start-add-bookmark" type="submit"></button></div><div class="filter-div"></div></section>
     <div class="list-display">
       <ul class="list-ul"></ul>
@@ -34,15 +38,15 @@ const generateFilter = function (){
     `)
 };
 
-const generateListItem= function (bookmarks){
+const generateListItem= function (bookmark){
     return `
-        <li data-item-id="${bookmarks.id}">
+        <li data-item-id="${bookmark.id}">
         <div class="small-div">
           <div class="small-list-title">
-            <h3>${bookmarks.title}</h3><button class="expand-from-list" type="submit"></button>
+            <h3>${bookmark.title}</h3><button class="expand-from-list" type="submit"></button>
           </div>
           <div class="list-rating">
-            <h3>${bookmarks.rating}</h3>
+            <h3>${bookmark.rating}</h3>
           </div>
           <div class="list-see-more"></div>
         </div>
@@ -99,35 +103,96 @@ const generateListItem= function (bookmarks){
                 <div class="rate-new">
                   <label for="rating">Rating</label>
                   <select name="rating" class="new-site-rating">
-                       <option value="1">1-Star</option>
-                       <option value="2">2-Stars</option>
-                       <option value="3">3-Stars</option>
-                       <option value="4">4-Stars</option>
-                      <option value="5">5-Stars</option>
+                  <option value="1">Bad</option>
+                  <option value="2">so-so</option>
+                  <option value="3">Good</option>
+                  <option value="4">Great</option>
+                  <option value="5">Amazing</option>
                   </select>
                 </div>
                 <div class="new-site-submit">
-                    <button type="submit" class="add-bookmark">Save</button>
+                    <button type="submit" class="add-bookmark-submit">Save</button>
                 </div>
             </form>
         </div>
         `);
     };
 
+    const generateError = function (message){
+        return`
+        <section class="error-content">
+          <button id="cancel-error">X</button>
+          <p>${message}</p>
+        </section>
+      `;
+    };
+
+    const generateBookString = function (books) {
+        const bookmarks = books.map((bookmark) => generateListItem(bookmark));
+        return items.join('');
+      };
+
 
 //////////////////Render Funcs
 
 //const render = function () {};
 
+const renderError = function () {
+    if (store.state.error) {
+      const el = generateError(store.error);
+      $('.error-container').html(el);
+    } else {
+      $('.error-container').empty();
+    }
+  };
 
+const renderBookmarksList = function () {
+    renderError();
+    let books = [...store.bookmarks];
+    if(store.state.filter > 0){
+        return store.filterByRating(books);
+    }
+    const bookmarksString = generateBookString(books);
+    $(".list-display").html(bookmarksString);
+};
+
+const renderPage = function () {
+    generateStart();
+    generateFilter();
+    generateAddBookmark();
+    renderBookmarksList();
+};
 
 
 ///////////////////Event Handler Funcs
 
 //const handle = function (){};
 
-///bindListener func
+const handleCloseError = function () {
+    $('.error-container').on('click', '#cancel-error', () => {
+      store.state.error(null);
+      renderError();
+    });
+  };
 
-///main call
+
+
+
+const handleAddBookMarkSubmit = function (){
+    $('main').on('submit','.add-bookmark-form',function (param) {
+        param.preventDefault();
+        const newBkmkTitle=$().val;
+        const newBkmkURL=$().val;
+        const newBkmkDesc=$().val;
+        const newBkmkRating=$().val;
+        api.addNewBookmark(newBkmkTitle, newBkmkURL, newBkmkDesc, newBkmkRating)
+      })
+};
+
+
+
+
+
+///bindListener func
 
 ///export default{};

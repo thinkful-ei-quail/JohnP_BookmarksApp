@@ -16,16 +16,12 @@ const  bookmarks = [];
       adding:false,
       error: null,
       filter:0,
+      display:true,
       BASE_URL:'https://thinkful-list-api.herokuapp.com/johnp/bookmarks/'
   };
 
 
-
-
-
-
-
-///funcitons for finding things by id ie addBook
+///functions for finding things by id ie addBook
 
 const findBookmarkById = function (id) {
     return this.items.find(bkmk => bkmk.id === id)
@@ -50,16 +46,27 @@ const setError = function (error){
     this.error=error;
 };
 
+const rateTest = function (){
+    if(this.rating >=  filter){
+        this.display = true;
+    };
+}
+
+const filterByRating = function (bookmarks){
+    return bookmarks.filter(book=>rateTest());
+};
 ///filterByRating////////////////////
 //////////////////////////////////
 /////////////////////////
 
-
-
-
-
-
 export default {
     state,
-    bookmarks
+    bookmarks,
+    findBookmarkById,
+    addNewBook,
+    findAndDeleteBook,
+    findAndEdit,
+    setError,
+    filterByRating,
+    rateTest
 };

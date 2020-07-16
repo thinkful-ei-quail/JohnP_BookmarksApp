@@ -5,24 +5,25 @@
 
 
 
-// import $ from 'jquery';
-// import 'normalize.css';
-// import './index.css';
-// import api from './api';
-// import store from './store';
-// import APP from './APP';
+ import $ from 'jquery';
+ import './normalize.css';
+ import '../styles/styles.css';
+ import api from './api';
+ import store from './store';
+ import APP from './APP';
 
 
 
-////function main(){
-//     api.getItems()
-//     .then((items) => {
-//       items.forEach((item) => store.addItem(item));
-//       shoppingList.render();
-//     });
-//   shoppingList.bindEventListeners();
-//   shoppingList.render();
-// };
+const startPage = async function  (){
+    try{
+        api.getBookmarks();
+        const responseOne= await api.getBookmarks();
+        store.bookmarks.forEach((book)=> store.addNewBook(book));
 
-// $(main);
-// };
+}
+catch (error){
+    return error.message;
+};
+}
+
+ $(startPage)
