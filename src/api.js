@@ -14,29 +14,26 @@ const fetchViaAsyncAwait = async function(...args){
     try{
         const responseOne = await  fetch(...args);
         const data = await responseOne.json();
-        console.log(data);
+        console.log('fetchViaAsyncAwait ran');
         return data;
     }
     catch (error){
+        console.log(error.message);
         return error.message;
     };
-
 };
-
  const getBookmarks = function () {
      return fetchViaAsyncAwait(`${store.state.BASE_URL}`);
 };
 
-
-const addNewBookmark = function (name, address, descr, num ) {
-    if(descr ===''){
-    descr ="don't forget to add a description here"};
-    num=parseInt(num);
-    if(num === null){
-    num = 0;}
-    else{num = 5};
-    const newBookmark=JSON.stringify({title:name,url:address,desc:descr,rating:num})
-    console.log(newBookmark);
+const postNewBookmark = function (newBookmark) {
+    console.log("API firing")
+    if(newBookmark.desc ===''){
+    newBookmark.desc ="don't forget to add a description here"};
+    if(newBookmark.rating === null){
+    newBookmark.rating = 5;}
+    newBookmark=JSON.stringify(newBookmark);
+    console.log(`New Bookmark to post is${newBookmark}`);
      return fetchViaAsyncAwait(`${store.state.BASE_URL}`, {
         method : 'POST',
         headers:{
@@ -66,10 +63,7 @@ const deleteBookmark =function(id){
 
  export default{
       getBookmarks,
-      addNewBookmark,
+      postNewBookmark,
       updateBookmark,
       deleteBookmark
   }
-
-
- getBookmarks();

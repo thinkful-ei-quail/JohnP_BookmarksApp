@@ -3,7 +3,6 @@
 'use strict';
 /* eslint-env jquery */
 
-
 import $ from 'jquery';
 import api from './api';
 import store from './store';
@@ -12,338 +11,311 @@ import store from './store';
 
 //const generate = function (){};
 
-const generateStart = function (){
+const generateHome = function (){
     $('main').html(`
-    <section class="display-container">
-    <div class="error-container">Error Will Be Here</div>
-    <section><div class="addform"><button class="start-add-bookmark" type="submit"></button></div><div class="filter-div"></div></section>
-    <div class="list-display">
-      <ul class="list-ul"></ul>
+    <div class="header-container child">
+    <header role="marquee">
+        <h1>markabl.</h1>
+    </header>
+    <div class="error-container"></div>
+</div>
+<div class="filter-div child ${store.state.adding === true ? 'hidden' : '' }"></div>
+<div class="start-add-book"><button class="start-add-bookmark" type="submit">Add New</button></div>
+<section class="display-container">
+    <section class="add-bookmark-sect child"></section>
+    <div class="error-container child"></div>
+    <section class="start-page">
+        <div class="main-controls child"></div>
+        <div class="filter-div child"></div>
+        </div>
+    </section>
+    <div class="list-display ">
+        <ul class="list-ul child"></ul>
     </div>
-  </section>
-      `)
+</section>
+`
+)
 };
 
-const generateFilter = function (){
+const generateStart = function (bookmarks) {
+    console.log('Generating Home');
+    console.log(store.state.adding);
+    if (store.state.adding) {
+        console.log('adding is true');
+        $('button[class="start-add-bookmark"]').text('Cancel');
+        console.log('generateStart ran');
+        return generateAddBookmark();
+    } else {
+        console.log('adding is false');
+        $('button[class="start-add-bookmark"]').text('Add Bookmark');
+        console.log('generateStart ran');
+        return generateBookmarkList(bookmarks);
+    }
+
+};
+
+const generateFilter = function () {
     $('.filter-div').html(`
     <label for="rating-select">minimum rating:</label>
-    <select class="rating-filter" name="rating-select" id="rating-select">
-        <option value="1">Bad</option>
-        <option value="2">so-so</option>
-        <option value="3">Good</option>
-        <option value="4">Great</option>
-        <option value="5">Amazing</option>
+    <select class="rating-filter" name="rating-select" id="rating-select" placeholder="${store.state.filter}">
+        <option value="0"  ${store.state.filter === 0 ? 'selected' : ''} >Select</option>
+        <option value="1"  ${store.state.filter === 1 ? 'selected' : ''} >1</option>
+        <option value="2"  ${store.state.filter === 2 ? 'selected' : ''} >2</option>
+        <option value="3"  ${store.state.filter === 3 ? 'selected' : ''} >3</option>
+        <option value="4"  ${store.state.filter === 4 ? 'selected' : ''} >4</option>
+        <option value="5"  ${store.state.filter === 5 ? 'selected' : ''} >5</option>
     </select>
-    <div class="filter-button-div">
-    <input type="checkbox" id="filter-checked" class="filter-checked" />
-    <label for="filter-checked">Filter</label>
-    </div>
-
     `)
 };
 
-const generateListItem= function (bookmark){
+const generateAddBookmark = function () {
+   console.log('generateAddBookmark ran');
     return `
-        <li data-item-id="${bookmark.id}" class="bookmark-li ${bookmark.id}">
-        <div class="small-div">
-          <div class="small-list-title">
-            <a href="${bookmark.url}"><h3>${bookmark.title}</h3></a>
-          </div>
-          <div class="list-rating">
-            <h3>${bookmark.rating}</h3>
-          </div>
-          <div class="list-see-more"><button class="expand-from-list" name="detail-view" type="submit"></button><label for="detail-view">Detail/Edit</label></div>
-        </div>
-      </li>
-        `
-    };
-
-   const generateExpandedBook = function (bookmark){
-        return `
-    <div class="xpanded" data-item-id="${bookmark.id}">
-        <div>
-            <div class="xpanded-title">
-                <input type="text" class="bookmark-title edit-site-name"
-                    placeholder="${bookmark.title}">
-            </div>
-            <div class="edit-and-delete-div">
-                <button class="delete" name="" type="submit"></button>
-            </div>
-            <div class="xpanded-link">
-                  <label for="bookmark-url">('https://' is required)</label>
-                  <input type="url" name="bookmark-url" class="edit-site-url" placeholder="${bookmark.url}"
-                  required>
-            </div>
-            <div class="xpanded-desc">
-            <input type="text" name="bookmark-description" class="form-control edit-site-desc"
-                    placeholder="${bookmark.description}" required>
-            <button class="edit-desc" name="" type="submit"></button>
-            <div class="xpanded-rating">
-            <div class="edit-rating">
-                  <label for="rating">${bookmark.rating}</label>
-                  <select name="rating" class="edit-site-rating">
-                  <option value="1">Bad</option>
-                  <option value="2">so-so</option>
-                  <option value="3">Good</option>
-                  <option value="4">Great</option>
-                  <option value="5">Amazing</option>
-                  </select>
-            </div>
-            <div class="list-see-less"><button class="contract-from-list" name="regular-view" type="submit"></button><label for="regular-view">Done</label></div>
-        </div>
-    </div>
-        `
-    };
-
-    const generateAddBookmark = function (){
-        $('.addform').html(`
-        <div class="add-form-container">
-            <form id="add-bookmark-form">
-                <div class="addform">
-                    <label for="bookmark-title">Add New Site</label>
-                    <input type="text" name="bookmark-title" class="bookmark-title new-site-name"
+        <div class="add-form-container child">
+            <form id="add-bookmark-form" class="">
+                <div class="addform flexdaddy" >
+                    <label for="new-bookmark-title" class="flexkid">Add New Site:</label>
+                    <input type="text" name="new-bookmark-title" class="bookmark-title new-site-name flexkid"
                     placeholder="Enter Site Name" required>
                 </div>
-                <div class="addform">
-                  <label for="bookmark-url">URL ('https://' is required)</label>
-                  <input type="url" name="bookmark-url" class="form-control new-site-url" placeholder="http(s)://"
+                <div class="addform flexdaddy">
+                  <label for="new-bookmark-url" class="flexkid">URL ('https://' is required):</label>
+                  <input type="url" name="new-bookmark-url" class="form-control new-site-url flexkid" placeholder="http(s)://"
                   required>
                 </div>
-                <div class="addform">
-                   <label for="bookmark-description">Description</label>
-                    <input type="text" name="bookmark-description" class="form-control new-site-desc"
+                <div class="addform flexdaddy">
+                   <label for="new-bookmark-description" class="flexkid">Add a description:</label>
+                    <input type="text" name="new-bookmark-description" class="form-control new-site-desc flexkid"
                     placeholder="Enter a description..." required>
                 </div>
-                <div class="rate-new">
-                  <label for="rating">Rating</label>
-                  <select name="rating" class="new-site-rating">
-                  <option value="1">Bad</option>
-                  <option value="2">so-so</option>
-                  <option value="3">Good</option>
-                  <option value="4">Great</option>
-                  <option value="5">Amazing</option>
+                <div class="rate-new flexdaddy">
+                  <label for="new-rating" class="flexkid">Rating:</label>
+                  <select name="new-rating" class="new-site-rating flexkid">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
                   </select>
                 </div>
-                <div class="new-site-submit">
-                    <button type="submit" class="add-bookmark-submit">Save</button>
+                <div class="new-site-submit flexkid">
+                    <button type="submit" class="add-bookmark-submit flexkid">Save</button>
                 </div>
             </form>
         </div>
-        `);
-    };
+        `;
+};
 
-    const generateError = function (message){
-        return`
+const generateError = function (message) {
+    return `
         <section class="error-content">
           <button id="cancel-error">X</button>
           <p>${message}</p>
         </section>
       `;
-    };
+};
 
-    const generateBookString = function (books) {
-        const bookmarks = books.map(bookmark => generateListItem(bookmark));
-        return bookmarks.join('');
-      };
+const generateBookmarkList = function (bookmarks) {
+    console.log('generateBookmarkList Started');
+    const bookmarkListItems = bookmarks.map((bookmark) => {
+        return `
+            <li data-item-id="${bookmark.id}" class="bookmark-li ${bookmark.id} child flexdaddy ${bookmark.expanded === true ? 'hidden' : '' }">
+            <div class="small-div">
+              <div class="small-list-title flexkid">
+                <a href="${bookmark.url}"><h3>${bookmark.title}</h3></a>
+              </div>
+              <div class="list-rating flexkid">
+                <h3>Rating: ${bookmark.rating}</h3>
+              </div>
+              <div class="flexmom">
+              <div class="list-see-more"><button class="expand-from-list flexkid" name="detail-view" type="submit">${bookmark.expanded === false ? 'More' : 'Less' }</button></div>
+              <div class="edit-and-delete-div"><button class="delete flexkid" name="delete" type="submit"> Delete </button>
+              </div>
+          </div>
+            </div>
+          </li>
+          <hr>
+    <div data-item-id="${bookmark.id}" class="bookmark-li expanded-bookmark group ${bookmark.expanded === false ? 'hidden' : '' }"  >
+        <div class="flexdaddy child">
+            <div class="xpanded-link flexkid">
+                  <p type="url" name="bookmark-url" class="edit-site-url">URL:${bookmark.url}</p>
+            </div>
+            <div class="xpanded-desc flexkid">
+                <p type="text" name="bookmark-description" class="form-control edit-site-desc">${bookmark.desc}</p>
+                <div class="xpanded-rating flexkid">
+                    <div class="edit-rating">
+                    </div>
+                </div>
+            </div>
+        <hr>
+    </div>
+</div>`;
+    });
+    return `
+            <div class="bookmark-wrapper">
+                ${bookmarkListItems.join("")}
+            </div>`;
+};
 
-
-
-//////////////////Render Funcs
+/////////////////////////////////////////////////Render Funcs
 
 //const render = function () {};
 
 const renderError = function () {
     if (store.state.error) {
-      const err = generateError(store.error);
-      $('.error-container').html(err);
+        const err = generateError(store.error);
+        $('.error-container').html(err);
     } else {
-      $('.error-container').empty();
+        $('.error-container').empty();
     }
-  };
-
-const renderBookmarksList = function () {
-    renderError();
-    let books = store.bookmarks;
-    if(store.state.filter > 0){
-        books=store.filterByRating(books);
-    }
-    const bookmarksString = generateBookString(books);
-    $(".list-display").html(bookmarksString);
 };
 
-
-
-
-const renderExpandedView = function (id) {
-    const bookmark = store.findBookmarkById(id);
-    const expand = generateExpandedBook(bookmark);
-    $(`'.${id}'`).html(expand);
-};
-
-
-const renderPage = function () {
-    generateStart();
+const renderMain = function () {
+    console.log(`renderMain started`);
+    console.log('Rendering Page');
+    generateHome();
     generateFilter();
-    generateAddBookmark();
-    renderBookmarksList();
+    if(store.state.adding){
+        $('section.add-bookmark-sect').html(generateAddBookmark());
+    }{
+    let bookmarks = store.bookmarks;
+        if(store.state.filter > 0){
+            bookmarks =bookmarks.filter((bookmark) => bookmark.rating >= store.state.filter)};
+    $(`.display-container`).html(generateStart(bookmarks));
+    console.log(`renderMain ran`);
+    console.log(bookmarks);}
 };
 
-
-///////////////////Event Handler Funcs
+//////////////////////////////////////////////////////////////Event Handler Funcs
 
 //const handle = function (){};
 
-const handleCloseError = function () {
-    $('.error-container').on('click', '#cancel-error', () => {
-      store.state.error(null);
-      renderError();
-    });
-  };
-
-
-
-
-const handleAddBookMarkSubmit = function (){
-    $('#add-bookmark-form').submit(function (event) {
-        event.preventDefault();
-        const newBkmkTitle=$('.new-site-name').val();
-        const newBkmkURL=$('.new-site-url').val();
-        const newBkmkDesc=$('.new-site-desc').val();
-        const newBkmkRating=$('.new-site-rating').val();
-        console.log(newBkmkTitle, newBkmkURL, newBkmkDesc, newBkmkRating);
-
-        api.addNewBookmark(newBkmkTitle, newBkmkURL, newBkmkDesc, newBkmkRating)
-        .then((newBook)=>{
-            //store.formatForStorePush(newBook);
-            store.addNewBook(newBook);
-            renderPage();
-        })
-        .catch((error)=>{
-            store.setError(error.message);
-            renderError();
-        });
-    });
-  };
-
-const getBkmkIdFromElement = function (bookmark) {
-    return $(bookmark)
+const getBkmkIdFromElement = function (item) {
+    return $(item)
         .closest('.bookmark-li')
-        .data('.item-id');
+        .data('item-id');
+
 };
 
-const getFilterValue =function (){
-    console.log($('.rating-filter').val());
-    return $('.rating-filter').val();
+const handleCloseError = function () {
+    console.log(`handleCloseError started`);
+    $('.error-container').on('click', '#cancel-error', () => {
+        store.state.error(null);
+        renderError();
+    });
 };
 
-const getName = function () {
-   return $('.edit-site-name').val();
+
+const handleAddStart = function () {
+    console.log('handleAddStart started');
+    $('main').on('click','.start-add-bookmark',(event) => {
+        console.log('Add was clicked');
+        store.state.adding=!store.state.adding;
+        store.state.error = null;
+        renderMain();
+        console.log('handleAddStart ran');
+    })
 };
 
-const getURL = function () {
-    return $('.edit-site-url').val();
- };
-
- const getDesc = function () {
-    return $('.edit-site-desc').val();
- };
-
- const getRate = function () {
-    return $('.edit-site-rating').val();
- };
-
-const handleDeleteBookmark = function () {
-    $(".xpanded").on('click','.delete',event=>{
-        event.preventDefault();
-        const id= getBkmkIdFromElement(event.currentTarget);
-        api.deleteBookmark(id)
-        .then(()=>{
-            store.findAndDeleteBook(id);
-            renderPage();
-        })
-        .catch((error)=>{
-            console.log(error);
+const handleAddBookMarkSubmit = function () {
+    console.log(`handleAddBookMarkSubmit started`);
+    $('main').submit('.add-bookmark-submit', function (event) {
+        store.state.error = null;
+        store.state.adding=!store.state.adding;
+        const newBookmark = {};
+        newBookmark.title = $('input[name="new-bookmark-title"]').val();
+        newBookmark.url = $('input[name="new-bookmark-url"]').val();
+        newBookmark.desc = $('input[name="new-bookmark-description"]').val();
+        newBookmark.rating = $('select[name="new-rating"]').val();
+        console.log(`sending${newBookmark} to POST method`);
+        api.postNewBookmark(newBookmark)
+            .then((data) => {
+                store.bookmarkStorePush(data);
+                renderMain();
+            })
+            .catch((error) => {
                 store.setError(error.message);
                 renderError();
+                renderMain();
             });
     });
 };
 
-const handleFilterSubmitClicked = function (){
-    $('.filter-button-div').click(()=>{
-        store.state.filter =getFilterValue();
-        renderPage();
-    })
-};
-
-const handleExpandFromList = function (){
-    $('main').on('click','button','.expand-from-list',event=>{
+const handleDeleteBookmark = function () {
+    $('main').on('click','.delete', event => {
         event.preventDefault();
-        const id = getBkmkIdFromElement();
-        renderExpandedView(id);
-    })
-};
-
-const handleCollapseAndSubmit = function (){
-    $('main').on('click','button','.contract-from-list', event=>{
-        event.preventDefault();
-        const id = getBkmkIdFromElement();
-        const name = getName();
-        const desc = getDesc();
-        const url = getURL();
-        const num = getRate();
-        const newData={title:name,url:url,desc:desc,rating:num};
-        store.findAndEdit(id, newData);
-        api.updateBookmark(id, newData)
-        .then(() =>{
-            store.findAndEdit(id, newData);
-            APP.renderPage();
-        })
-        .catch((error) => {
-            store.setError(error.message);
-            APP.renderError();
-        });
+        console.log('delete was clicked')
+        const id = getBkmkIdFromElement(event.currentTarget);
+        console.log("Deleting "+id);
+        api.deleteBookmark(id)
+            .then(() => {
+                store.findAndDeleteBook(id);
+                renderMain();
+            })
+            .catch((error) => {
+                console.log(error);
+                store.setError(error.message);
+                renderError();
+                renderMain();
+            });
     });
 };
 
-const bindEventListeners = function (){
+const getFilterValue = function () {
+    console.log(`getting value from filter selection`);
+    $('main').on('change','select[class="rating-filter"]', (event) => {
+        store.state.filter = $('option:selected').val();
+        console.log(`Filter by minimum: ${store.state.filter} selected`);
+        renderMain();
+    })
+};
+
+const handleFilterSubmitClicked = function () {
+    $('main').on('change', 'input.filter-checked', () => {
+        console.log("Filter was checked");
+        if ($('input.filter-checked').is(':checked')) {
+            renderMain();
+            $('input.filter-checked').val(':checked');
+        } else {
+            console.log(`${$(this)} was un-checked`);
+            store.state.filter = 0;
+            renderMain();
+        }
+    })
+};
+
+const handleExpandFromList = function () {
+    console.log(`handleExpandFromList started`);
+    $('main').on('click','.expand-from-list', event => {
+        event.preventDefault();
+        const id =getBkmkIdFromElement(event.currentTarget);
+        console.log(`id is ${id}`)
+        const currentBook = store.findBookmarkById(id);
+        store.toggleExpanded(currentBook);
+        renderMain();
+    })
+};
+
+/////////////////////////////////////////bindListener func
+
+const bindEventListeners = function () {
+    console.log('bindEventListeners ran');
+    getFilterValue();
     handleAddBookMarkSubmit();
     handleCloseError();
+    handleAddStart();
     handleDeleteBookmark();
-
     handleFilterSubmitClicked();
-
+    handleExpandFromList();
 };
 
-///bindListener func
+/////////////////////////////////exports
 
-export default{
+export default {
     bindEventListeners,
-    renderPage
-};
+    generateStart,
+    generateFilter,
+    generateAddBookmark,
+    renderMain,
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // console.log('                                                                                                                                                                                                                                                                                                                                                        ̷̧̨̡̨̨̡̨̡̢̛̛̛̛̛̛̛̥͚͉̙̦̠̙̘͉̖͔̜̬̦̻̥͖̖͙̰̮͙̻͚̱͖̳̩͍̙̩̯̖̮̺̜͍͍̪̠̲͍̗̦͍̪̫̎́̀̀̒̃̽̑̉̉̐̏͛̋̀̂̽̎̐̃̀̾̆̆͆̈́̏͑͌̓̐͋͆͗͊̒̉̋̃̊̍̇̉̌̔͑͆̆͆͛̾͒̀͌̂̿̄̊̅͆̈́̄̅̃͋̊̍͐͑̏̋̄̔̏́̐̽̽̾̉͆́̔̒͑͊̅̇̾̏̏͗̾̊̽̈́́̃̽̈́͆̈́̑̿̊̒̆̑̐͒̊́̽̆̄̈̾̔̃̓̃̉͊̿̉̈́͗̔͂̌̀̿̀̽͐̈́̋̑̆̋͋̉̈́͂̓̒̿͋̇͂̓̎͌́͊̓̽̈́̈́̃̊́̆͂͒͋̀̈͑̉͊̆̾̌̾͋̿́͋͐͛͑̈́̈͊̄̔͂̎̂͗̈́̑̓̈̇̌̔͊̒̈̈́̓̐̍̌̿̈́̈́̔̏̂̀̐̍̔̓͗̅̒̌͌̿̈́̌̀̎̐̔̍̾͒͋͑̾͆͋̌̒̓̚͘̚͘̚̚̚͘̚̕̚̚̚̚̚̕̕̕̚͘͜͜͜͝͝͠͝͝͝͝͝͝͝͝͝͝͠͠͝͝ ̶̡̢̢̨̨̢̡̡̡̢̨̡̨̢̢̨̡̨̢̡̧̧̡̛̛̛̛̛͚̰̺̙͚͇̻̖̜͚͍̭̘̥̹̮̻̙̹͉̬̺͉͎̠͓̲͙̤̩̦̯̭̳̭͔̜͚̹̣̬̜̞̱̮̦͙̮̖̥̟̘͇̫̠͎͖̹̟̪̲̳̻̝̩̫̥͔͈̲͎̖̝͙̙̰̼̬͉̫̲͇͈̙̪͔̬̟̘͓̖̹͇̺̭͓̻̠̭̰̰̫̠̪̻̜̜̮͔̜̙̺̘͖͍̲̭̰̼̦͓̣͎̦̟͖̭͇͇̦̯̭̺̦̬̯͖͕͉̲̠̻̗̤̲̫͖͕̫͔̯͎͙̦͇̼͉̘̠͑̓͗̔͋̈́̏͛̎̏̄͆̀̈́̔̑̀̒̍́͐̈́̔̉̋̔̽̂̑́̀̆̋̊̒̂̈̓̉̔͗̄̈́́́̓̎̀͐͌͂͗̔̓̔̿͋́̈́̂͛̍̎̆̓̃͒̾̽̊̅̈̆̈̾̈͊̓̍̍͂̽̔̿̃̓̐͋͋̄̄̎͋͆̅̈́̀͂͋͆̎͛͛͐̍͊̎̋̾̈́̈̀̈́͊̀̋̃̈̏̄̅͗͆̏̊͒͛̀̀̃́͂̆͐̎̂̓͐́͗́̕͘̚͘͘͘̚̚̚̚̚͜͜͝͝͝͝͝͝͝͠͝͝ͅͅͅͅͅͅy̵̢̡̧̧̧̨̧̨̨̧̢̧̨̛͉͔̼̮̳͍̠̰̹̰̝̲̰̜̠̹̫̝̯̬̯̹̗̬͙͚͚̱̜̯̫̯̩̜̞͕͇͚̺̰̦̺̮̭̲̦̞̲̻̩͉̲̖̪̣͇̠̭̰̬̞͖̣̼̙̮͓̩̩̲͕̰̲͙̲̘̳̟̰̘̱͙̭̦̺̹̩̓̅̓̌̿̈́͋̄́̈̓͊̔̔̊̄͋̎̆̂̿̐̽̍̽̽̉̈́̑̄̍́́̋̾̈́̆͛̕̚̕͝͠ͅo̴̧̢̨̡̧̧̢̢̨̧̡̧̡̢̡̡̧̡̡̡̢̡̨̧̪͈̞̖͈̥̞͕̘̫̤͉̘̟̳̜̗͙̠͚̠̫͉̼̪̖̹͓̗̮̗̗̞͚̬̙̠̰̮̠̮̹̖͓̞̠̜̹̲̫͚͖̩̺̦͕͉͍̪̜̱̠̝̦̞̤̘̤̞̝͇͙̘̟̗̮̟̤͉̪̜̥̩͖͍̯̩̪̬̮̘̲̖̠̯͖̠͎̱̟̪̘͚͈̹̱͕̟̫̼̭͔̠͉̞͉̫̘͍̖̠͖͎͙̘̼̫̺͚͈̩̟̟̖͉̼̗̳̙̤̜̠̬͍̘̭̬̮͍̲̣̤̱̘͍̥͈̞͕̞̮̗͓͖̙̞̖̣̺̦͚͗̋͜͜͜͜͜͜͜͝ͅͅͅͅͅͅứ̶̛̭̈̉̀̅̈́͑͆́̉̉̌̾͂͗̂̂̒́̈́͐͌͋͒̿̐͂͆̿͛́̊̔̐͑͑̄͂̉̈́̌̌̀̍̀͆̑̏̄̇̈́͊̉̏̒͐͌̊̇̍͌̃̽̀̔̉͛̈́̊͑̏͛͋̇̓̎͋̈́̓̍̅͐͑̄̆͌̉̌͌̅̀̎̍́̅̉̀̍̂̂͊͋̊͒̏̇͋̈́́͒̎͑̾́́́͑̏́̅͆̄̋̑̔͆̈͌̓͗̒̉͂̀̓͆̍͑̈́̊̓̈́̍̉͂̒̏̎͑̅͐̏̿̓̈́͗͋̐̅̊́̀́̔̂̀͌̈́̋̀͌̐͆̊̏͒̊̉̇͌̔̅̀̇̔̔̌̕͘̚͘̕͘̕̚̕͘͘͘̚̚͘͘͝͝͝͝͝͠͠͠͝͠͝͝͠͝͝͠ ̵̡̢̨̢̢̨̨̨̡̨̧̢̨̨̡̧̨̧̨̡̛̳̻̹͓̰̘͇̖͙͈̗̼̩͓̼̼̩͍̟͚͉͕̪̺̰̲͈̪͎̭͚̹̱̪͎͎̻̗͓̙̙̝̯̝̱̱̪̩̝̦͚͓̦̳̮̳͉̳̙͉̻̫̺̰̭͍͉͉̯͍̝̤̪̜͓̼̯̰̜̹̲͍͖̼̯͉̮̬͎̤͇̙͈̩̖̮͈̺͖̥̟͓̹͖͕͍̼͖̼̯͈̯̣͈̜̲̺̳̗̮̺͇͕̞̪̹̲̟̝̩͎̦͙͚̥͓̣͇̻͙̳̙̲̰̰̥̘̩̬͔͎̠̥̭͍̣͓͓̼̻̝̲̲̗̼̭̼͙̬̞̟͔̤̖̞̞͉͔̭͚̞̹͙̩̗̥͔̳̙̙̜̥̩̞͕̩͈̳͚̜͚̗͎͕͙͍̬̫̣̩͈̻̖̙͇͎͔̼͈̖̫̱̮͕̦̫̗̞̠̰̜̬͙̘̥̘͖̼̻̤̈̍̿̃̀̿͐̐͑̈́͛̇̈́͗̐̂̔̿͊̉͒͒̍͗͜͜͜͠ͅͅͅͅͅͅͅͅͅs̷̡̧̡̡̢̨̢̨̡̡̛̛̛̛̛̗͚͕̱̟͕̣̜̮̯̼̰̖͓̟͉̪̪̹̟̞̳̖̗̩̭̙̦̠̦̣̲̫̗͖̻̹̗͈̳̳͚̭͍̝̥̪̮̤̟̲̤̫͔͙̬̘̹͙͉͙̦̺̙̠͎̝̗̹̦̘̖̯̫̫̭̟̫̞̦͉͉̺̻̯͔̹̹̖͇͙̩̙̗͊̊́̋͆́͊͂̑̔̐̐̒̉͒̔͑͂̏̇́̿͆̓̈́͌̐͛̆̍͒̓̓͑͆͂̄̄́̓͌͒͌̓̍̀̐͂̎́̌̾͑̈̈́̅͊̈́̎̆̂̽̈̏̈́̒́̅͊͑̿̿͌̈̊̍̎̈̃͋̽̐͌͑́͊̓͐̾͐̏̎͊̏̈͒̃͗̌̑͌̈́͋̉͆͐̀̐̏̂̆̀͐̍͆͂̊̋͋͋͋̀̔̅̔͂̎̈́̃͗̊̋̈̎̓́͊͛̀̀͆̎̈͆̎͋̒̆̈̈́̑̎̔̿͐̌̒̎̈̈̀̀́̈́̓̏̓̀̂̿͑̾̉͌̈́̈́͂̓͗̊́̔͛͛̈̑̐͆̌̊̈̊͒̈́͂̅̈́͛̀̓͊̑̇̉̾͗̅̏̉͆́̈́̈́̓̉͋͆̈́͑̒̎̉͛̿̈́͗̕̕͘̕̕̕͘͘̕͘̕͘̕̚̕̕̕̚͘͘͘̕͘͘͜͠͝͝͠͝͝͝͠͠͝͝͠͠͠͝͠ͅͅͅh̷̢̢̨̛̛̛̛̛̛̛̛̙̬̬̲̣͕̼͇̩͍̯͎̝͉͓̣̩̹͔͉̬̳̹͉̤͇̻͔̲̟͔̫̥̦̣͇̝̺̰̼͖̗̳̞̰͉̙̻͓̣̖̩̗͔̥͈̹̜̻͉̙̟̘̘̰̖͖̝̤̜̲̞̃̈́͋̇̈́̈́͛̉͋̔̐̔͒̓̀͑͗̾̂̄̔͗͋̏̅̂̔̏̌͋̉̌́͑͆̍̔̾̄͐̀̾̈̓̓̾̉̀͗̎̈́̌̾̈́̏͑̑̈́̑̓̇̈̐̏̐̾͒̇̓̍̏̂̀̀̔̑̈́̈́͂̽̀̓͑̂̑͛͛̒͒͆̊̋̃̒̋͊̀́̓̏̋̄̄̈́̓͛̏̽̒̔̾̓̎́̃̀̈́̓́̂́͑̀̄̇̂̅̌̀̐͐͑͛̀͋̌̿̋͗̈́͒͋̎̔̅͆͛́͊͛̋̐̈̀̊̉̌̐̍̓̿͌̐͆͒͒͒̈́͒́̈́̋̃̆̇͑̈̔͊̈́͒̐̆̉͂̿́́̈͆̍̊̊͘̚̚͘͘̚̚̚̚͘̚̕̚͘̕̚͘̕̕͘͘̕͝͠͝͠͝͝͝͝͝͠͝͠͝͠͝͝͠͠͝ͅͅǫ̷̢̨̨̢̨̡̢̧̢̢̧̡̨̡̡̡̡̢̡̛̛̛̛̛̛̛͎̦̻̫̞̱͖̝͈̩̰̝̪̳̪͖̮̜̼͚̻̙̭̣̜̟̰̲̮͕͙̳̪̲̟̹͇̼͚̙̰̖̻̘̹͙̰̞͍͎̝̬̱͇̪̪̹̠͚̗͎̰͇̜̦̙̗̗͉̣͚͉̙̳̲̱̳̺͈̞̤̲͉̰̰̜̩͍̫̜͎̗̖͙̰̯͉͔̩̺̝̫̱̮̻̺̤̜̱̳͍̱̯̘̩͙̥̳̩̦̟̫̣̳͈̘͕͔̲̬͖̥͕̳͙̮͕͈͓̣͇͈̏̌̆̃̃̇̋̐̐̈́͆͗̈́̇̉͒͒̒̄͂͊͆̇̃̈́̈͆̈́̓͊͆̈̉̏͂̔̉̃̓̅̂̒̑̓̿̄́̄͒̏̈́̾̀͆̑̍́́͑̎̅̽͋̋͑̿͋͌͛̍̏̑͐͒̃̈́̈́̓̍͛̃̈́͌̏̅̔̄̈́͛͑̈̓̇̿̾͂͒̍̈́̒̀̍̍͆̇̿̑͗̐̀̒̀̇̈́̐̓̐̇̀̍̒͌̈̏͆̎́̈́̈́̆͌̈́͗̅̆͊̔̐̄̽͐̏̀͒́͌̇̀̈́̓̀̃̓́̇͑͌̌̿̄̆̌̽̐̀̆̈̈̂̓͂̐̃̈́̊̓͘̕̕͘̚̕̕̚͘͜͜͜͠͝͠͠͠͝͝͝͠͝͝͝͝͝͠͝͝ư̷̢̡̧̡̧̢̨̢̢̡̨̢̧̡̨̨̧̡̨̧̨̛̛̛̛̛̛̛̠̺̞̖͎͙̥̬͈̼̻̟̹̗͈͚͖̘̱͎͎͈̺̞̬̖̻̠̮̣̩̠̙̗̞͍͉̫̟̝̲̬̻̫͍̙͙̲̼̙̙̙̬͖̘̮̻͙̝͔̰͕͖̙̼̜̤̯͓̠̪̹̥̺̘̰̠͕̯̺͔̮̦̺̪͉̱̭̩̩͎̖̳͈̫̗̝̰͕͎̮̳̳̪͙͚̟̫̫̺̦̟̲̙͚̪̺̲̼̹̝̼͙̰͈͓̩͕͕͉̪̼͍̪̲͈̬̞̮͖̟̙̹͓͕̤͚̜͙̳̭͇͍͈̝̭̼͙͖͇̹̥̗̮̞̬̮̟̞̣̙͖̣̺̻̩̜̬̥͖͔͉̙̹̤̤̹̱͔̖̹͚̻͕̞͚̦̪̙̱̬̞̘͙͍͚̘̯̗͍͎̱̫͓͋̔̑̉͑͌̓̆̂͗͗̽̏̍̂̂̉̐̓̇̂̑̂͌̑͂͋͒͋̊͑̓͒́̓͆̒̽͆̾͋̈́̆̌͋̃͑̐́́͐̌̈́́͊̋́̀̆̀̽̃̇̎̇́̋͐͂́̓̅͋̐͒̍͌͋̔̆̑̊̉͆͐̏̽̍̓̑̉̔̀̐̊̃̽̔̌̈́̈́̂̉̑̈͐̌̾̀̿̎̅͑͋̿̋̂̍̉͒̈́̉͛̓̿̐̐͒̎̐̆̏̑͌̈́̏̀̓̾͊͑̊́̂͂̈́̉̎̒̏̾̂̋̂̋̇͋̍̓͑̓͛̍̐̐̈͌̊̾̓͒̔̽̈́̔̒̑̌̃̂͐͌́̈́̾̌̾͐̾̅̈͑̿̀͌̔̃͂̑̃̑̀͑̍́́͌̈́́́̌̆̂̅̈́̈́͋͑́͛̾̈͋͐͐̉̿̈́̋̓̒̅̋̈́͂̃̇̊̐͛̎̇͑̄͂̋͆͘̚͘̕͘͘͘̚̕̕͘͘͜͜͜͜͜͜͜͜͜͜͜͜͝͝͝͝͠͠͝͠͠͝͝͝͝͝͝͠͝͝͠͝͠͝ͅͅͅͅͅͅͅͅl̶̢̢̨̢̧̧̧̢̢̛̛̛̛̛̛̳̬̳̤̗̗͕̰̬͓̩̮̭̙̺̭͇̳͓̼̣̹̪͉̰͉̰͕̣̪̖̣̝̩̙̥̮̝̠̮͇̜̤̥̙͚̺͖̱͎̯̤̩̞͙̥̟̘͍̰͉̞͍̳̯͚͚͓̗̱͔͔͍̜̹̬͙̰̠͙͉͉͎̝̞̬̜͖͇̪̮̤̖͈̪͉̬̮̮̖͙̬̘̻͚̞͇̪̥̥̗̠̹̲̫͕̙͓̩͓̗̗͙̪͙̍̈́̋̎͂̓̐͋̄̍̂͛̑̈́͐̓̾̈́̏͊̃̌͒͒͆̐̀̀͑̊̑̔̏͐͂̈͐̏̌͋̅̊̅̎̔̍̏̇̌̀͒̐͛͌́̏̂͆́́̓̽̽͐͒̾̓̅̈́̋̽̿͋̅̃͂̈́͑̑̀͌̈́̒̍́͛̉̿͌̌̓̄͛̿́̉͂̈̀̏̓̉͂̆̃̃̆̏́͋͒̉̈́͋̎̀̈̃̈́̋̃̈́̃̔͌́͒̂̒́̍͂́͗͌̎͗͌̈́̔͂͌̈̂̉̾͊͗̐̓͑̋́͊̎̐̽̎͛̇̈̆̄̎͗̚͘̕̕͘̚̚̚̚̚͘̕̚͘̚͝͝͠͝͝͝͝͝͝͝͝ͅͅͅͅͅͅḑ̸̨̨̡̨̧̡̢̢̧̧̡̢̢̢̡̨̡̡̧̨̨̡̛̛̛̛̛̛̖̺̲̼͉̬̘͕̝͍̳̯̳͚͔̰̺̝̮͙̼̬͓͖̹̘̳̞͎̳̖̦̥̦̮͎͕̟̦̥͙̙̝͈͍̗̱̪̥̲̘̦͔̯̳͕̪͚̠̘͔̗̟̻̯͕̳̘̝̬̯̖̦̞̜̻̺͕̹̰͇̝̟̯̙̪͔̮̼̳̥͉̥̟̝̪̼͕̠͉̜̩͉̬̣̹͖̤̖̮̞͍͎̖̫̺̩͎͍̬̩̯͇̗͚͇̩̺̖͓̱̭̪͇̭̱̟̘̙͚̣̱̖͇̯̘̭̖̗͎͙͈͚̫͉͔̫̠͈̗͉̯̪̰̘̞̖̞͎̜̻̻̳̝͚̬̙̰̻͓͙͈̮̺̬̼̼̰̺̭̮̟̤̦̥̜̙̲̱̭͇̮̞͚͓̻͎͈̙̰̻̻͚͕̝͈̜̫̥̱̞̍̀̋̊̈́̾̊̔͗̾̑̏͗̒̓̏̒͗̃̒̄̏̓̓̎͒̑͆̒̽͑̽̋̒͒͒̓̄̏̍̓̿́̈̈̐̈̓̈́̽̀͌̔͊̊̈́͒͒͛̂̍́͐͛̈͗͐̇̄̉̈̐̉͌͑̒̂̀̔͂̈́̑̔͊̾͐̊̒͑̀̒̅̿̎̋͋̾̎̋͊͌̐͛̈́̎̇͋̎͊͌̌͆͒̍̈̄̓͋̓̓͊̆́̒͘̚̕͘͘̕̕͘̚͘͜͜͜͜͜͜͜͜͝͠͝͝͝͝͠͠͠͝͝͝͝͝͝ͅͅͅͅͅͅͅͅ ̸̢̢̨̡̢̛̛̩̝͔̣̳̲̙̤͍̦̠̝̻͕̤̦̖̲͈̹̳̩̟̜̫̩͕͍̣͓̱̝̫̬̙̬̖̦̙̼̗̱̳̙̱̝̜̫͔̟͔̲̫̞̗͔̩̜̘͉̣͚͓̟̭̳̱̟͎͙̻͇̻̜̭̩͖͚͇̩͉̞̥̙̜̘̼̪͙̼̟͕̥̥̗͍̫̯̜̣̍̆̓̾̐̈́̓́͑͂́̃͛͑͂̎̅̈͒̅̅͒͐̿̒̏̋͗̆̎̎̓̉̓̈́̈́͆̂̎̂͌̿͛̒̎́̑̐̏̊́̓̍͗͊̌͌͊̿̓̿́̓͑͐͑̋̈́͐̂̊̊̓̔̾́̄̄͑̾̿̈́͌͐̈́͂̽͊̈́̽̎̀̈́̾͋̇͛̃̃́̑̅̀͊̈͑̍̓̿̋̒̊̌̂̄̑̎̀͐́̎̅͆͛̈́̈́̊͊̏̈͒̈́͋̏̈́̾͒̉̊͋̉̄͑̔̏̈́̔̎̓̂̌̉̑̀̄͊̍͌̊̍́̅̌͆̉͂́̓̂̈̑̓́̏̎̚̚̕̕͘̕͘̚͘̚͜͝͠͠͝͝͝͝͠͠͠͠͝͠͠ͅͅͅͅn̶̨̨̡̨̢̢̢̨̨̨̡̧̧̨̨̨̧̧̨̧̧̢̧̨̢̡̡̡̨̧̨̛̟̬̝̦̱̺̙͔͇̭̬͚̤̳̭͈͔̬̝̻̬̯̦̤̯͎̜͚̤͓̬̩͉̼̳̪̗̳̘̜̠̼̤̗̣̞̖̻̱̦̫̦̳̱͇͍̣̩̜̹͓͈̣͇̠̹̪̜̟͇̮̰̦̘̻͙̳̘̠͕̳̠̙͖̜̗̝̮̘̲̼̯͙͇͉̘̝̬̱̪͉͖̘̣̥͎̱̭͙͔̳͕̮̰͔̯̼̮̳̣̩͚̼̲̻̖̥̖͖̲̘̼͇̣̣̘̻̬̣̫̪̥̪͉͇̝̙̯̣͎̦͎̟͙͓̳̘̠̻̤̭̦̣̰͍̜̖̫̖̲̟̬̰̥̼̥̦͎̲͖̼͚͔̻̭̤͍͚͔̲̱̝͍̗͎̝͙̙̩̼̮͇̩̹̤͚̋̆̀̆̉̏̎̏́̄̔̿̓̂̈́͋̈̈̋͑̒͑͒̒̍͛͋̀̇̑̓̔̿̾̈́͊̅̕͘̕͜͜͜͝͝͠ͅͅͅͅͅͅơ̴̢̧̢̨̢̨̡̡̢̧̧̢̡̨̧̢̢̢̧̨̧̡̡̢̨̢̨̛̛̛̗̩̩̭̭̪͈̥͕̳̞̫̲̱͖̭̻͇͇̗̮̫̻͇̤̥̗̯̟̼̥̙̳̱̪̗̖̫̫̳̻͚͙̬̝̦͕̪͍͙̞͚̫͍̜̠̦͚̲̤͈̳͖̝̩̼̠̩̟̮̼͈͕͖̘̖̰̼̤̖͔͈̟̺͈͇̺̟̰̠͚̥͓̫̟̤̺̜͚͓̜̤̭̣͉̟̼̙̘̜͈̗͇̯̣̲̬̟̟̗͕͓͇͚̮͓͍͓͔̪̙͚̯̥͇̯̥̖̼͓̣͔̯̠͎͚̥̘̞͚̪̭͍̙͕̻̤̩̥͎̲̤̬͕͎̭̳͉͈̖̯̞͍̘͓̜̯̜̼͉̜͖̯̩̙̐̑̓͒͐̈́́̓͆̍̈́͐̓͛̈͑̌̈̈́̌́̿͋̐̏̑͊̈̽̽͛̈̀̆̅̈̓̌̅̓̇̆̉̽̊̂͐̌̌̊̈́̋̂͛̅͊̈́̀̆͐̉̈́́̂̇̏̌̈́̇̀͗̍͗̌̔̽̈́͂̋̊̏̈́̈́̿͐̔͌̆͗̊̎͂͛̐̅́̓̊̇͌̇̒̾̋́̌́̾̀̊̃̽̌̆̌̑̈́͌̐̏̄̆̋̔͆̏̂͛͒͆̋͌̆̆̈̔̄̒̔̕̚͘̚̕͘̚͘͜͜͜͜͜͜͜͜͝͝͝͠͠͝͝͝͝ͅͅͅͅͅͅͅt̶̡̧̧̧̡̢̧̡̧̢̡̡̡̢̡̨̧̨̨̨̡̛̛̛͇̦̠̣͍͕͚̬̬̩͖̺̯̤̲̯͚̼͕̬̼̠̺͍̤̳̰̫̫͚̥̺͔̟͍̩̻̩͉̞͖̣͖͈̯̥͈̰̟̣̫͎̜̦̮͓̩̙̻͓̟̫̟̥͈͈̱̞̰̳͍̯̮̬̦͓̫̬͈̥͔͖̞̘̺͔̲̬̞̰͇̺̻̪̙̩̫̹̭̮̩̯͓͚̹̞̯̟̥̳͓̹̤̖̲̖̻̳͕̮̜̳̱̬͍͙̟̖͇̬͉̩͔̥̳̲̜͕̗̜̥̖̣͓̙͚͓͉̺̰͍̻͉̤̪̘͖̰̻̺̠̥͕̤͎͈̦̺̘̳̮̘̯̘̳̞͚͎̱̭͍̞̦̗̩̤̤̻̱̱͔͉̳͔̖͚̯̫̰͍̙̱͇̲̭̟͉̭̗̫̟͇̗̫̱̹̙̯͖̲̭̳̹̣̭̬̥̪͓͇͙̯̰̻̜̪̻͖̺̗̘̮̳͔̪̋͗̀̅̌̐̔̏̆̄̓̔̽̇̎̽̆̔̄̀̉̑̓͐̎̇̾͋̅̃͛̈̈̉͛͊̉͆̉̈́̎̐̓̔͋̄̃̾́̓̈́̾̇͗̒̀̂̃́͆͋̓͂̊͂̔̉̀͊̒̄͋͌̇͌̈̍̔͛̽̆̓̃́́̇̃͋̆̑̓̔͛͆̿̀̉̓̂̀̒̔͆̈͆͌̒̀̑̾́̇̿́̀̽̎̏͂̇͆̀̐̐̓̇̀̀͗̅̀̃̌͊́̈́̂̀͛́̀́̒̂̏̏̑̐́̾̒̇̐̊̒̍̏̕͘͘̚͘̕̚̕͜͝͝͝͝͝͝͠͝͠͝͝͠ͅͅͅͅͅͅͅͅͅͅͅͅ ̶̢̨̨̨̡̧̨̨̢̡̧̢̢̧̧̧̡̨̢̧̡̨̢̡̨̨̨̢̛̛̛̛̛̛̛̛̛̠̳̖̗͇̱̞̯̫̲̩̩̹̞͔̘̦̘̹̭̭̩̩͇̗̤̝͎̹͎̣̲̪͇̺̥̣̠̩͍͔̹̜̱̳̹͖̠̹̬̜͈͇̤̰͎̮͔̜̦͖͖̭͚̙͔̤͉͙͍͉̰̲̟̯̭̺̹̟̬͉̜̥͖̙̘̰̜̪͉̜̜̭͖͖͍̻̫̫̤̥̙̬͕̱̹͔̘̟͉̭͙̫̬̻͙̘͍͇̲̞͕̗͉̣̭͍̱͓͔͎͓͉͚̮̜̦̲̯̫̙̱̖͔͕̙̺̺̦̫̠͉͚̫̗̠̭̟̬̭̰͓̺̱̘͈̘̱̠̖̣̫͉̗̖̣̥̖͓͎̗̘̜̼̯̗̞̰̻̰͙͕̭̺̹͂͊́̉̎̔̅̏͒̽̐͆͒̌̋͂͗́̀̇̋̏̀̓͆̒́͋̽͋̍̋̂̋̍͗̒̈̐̍̒̋͋̉̿͛̋̃̀̆̾͛͗͊͗̂̄̍͆͂͐̎̑͑̿͗̈́̅́͐̄͗̄͛͛̈́͐̆́́̒̉̒̔̋̐̎̈́̀̂͛͊̊͗̄̈̀̀̆̽͑̆͑̿͂̌̓̿̈̂̾̇̋̍̃̃̅̉̂̓́̀͛̾̍̆̽́̑̐̎͂̔͂̊̈́̌͒̅̔̄̾̈̄̓̿͋̉́͗̓̄̓̅̾̈́̀̌̍͆̀̐̏͐̚̕͘͘͘̕̕͘̚͘̚̕͘̕͘͘͘͜͜͜͜͝͝͝͠͝͠͠͝͠͠͠ͅͅͅͅͅͅḩ̷̢̡̢̧̨̢̡̡̡̨̧̧̨̛̛̭̙̫͈͉͓̮̞̙͉̘͈̻̼̤̜͇͇͖̤̤̤̱͈͖̟̰̣̻̬̝̙̺͉̪̞͈̞̻̼̰̬̮̥͓̯̞̣͖͉̮͈̩̹̝̰̲͓̝̺̟̱̹̺͚͙͇̟̞̼̞͔͖̯̖͕͓̺̣̯̪̣̝͉̥̗̣̺̯̯̞͉͕̲͖̱̺̱̳̖̥̦̠̫̲͕͈͖̭̖̖̬͕̘̥̫̥̳̤̺̳̥͍̠̘̯̣̭̱͍̬͍̞̯͓̺̲̫͍̭̻̩̮͈͎̞͕̮̬̣̙̟̖͙̺̬̾̀̍̽́̒̃̈́̂̈́̈́̊̒̇͊̍̓̌̈́̿̍̀̃͐͆̏̀͗̓͑̾̊̍̂̏̿͂̊̀̈́͆̍͗́͑̔̉̈͊̈́̔̀́̾̅̄͊̊̽̌̽̀̾̇̍̿̈́̋̐̾́͆̈́̄͊̌̀͌̓͋͛͐̏̂̓͋́̀̈́̔͂̎̓̈́́̈́̑͂̋̃̑̒̋̒̌̒̎̽̑̕̕̕̕̚͘̕̕͘͜͜͜͠͝͝͝͠͝͝ͅͅͅͅą̶̧̢̡̧̢̧̧̨̡̧̢̢̧̨̡̨̡̧̡̧͖̻̰̞̘͓͈̫̻̞̫̹̤̺̩̙̙͙̜͔̩̦͙͓̩͇͇͚̫̯̮̤͉̳͔͈̠̺͇͍͙̠̻̞͓̺̻͚̯̭͚̗͙͔̠̯̯͍͉̤̣̹̼͍̮̗͖̝̲̦͓͍̖̟̰̬͎̻̫͈̩͍̩̹̙̲̤̻̮̻̻̪͖̝̣͙̯̦̖͇̠̬͖̪̮̝̪̪͓̭̮̩̥̖͕̳͎͈̞̲̙̪̪̣͖̳̞̹̪̤̫̯̯̞͈̪̻̖̘̣̜̠̦̯̝̮̥̪̪̫̖̤̱̩͓̺̳̜̩̘̜̜̺͓̥̘̻̞̫̪̹͔̩̣͔̻̜͕̙͈̗̊̈́͐̆̑͐̄̄͗̏̿͆͗͛͗̓̿̎̽̾̈́͗̈̊̐̈́̏̃̆͒͘͘̕̕͜͜͝ͅͅͅͅͅͅͅv̸̧̨̡̨̨̢̧̢̛̛̛̖̘̪͔̱̯̯̖͉͈̯̬̖̞͈͍̫̜̞̜͉͉̖͖̮̬̺̞̼̪̥̘̭̤̙̮͉̣̣̯̳̯͖̣̲̦͕͉̼̘̼̞̹̜͖̙̦͕͔̹̲͓̫͖̻̳̦̤̳͚͙̭̗̺̠̪̲͉̠̫͔̹̫̮̞͙͖͚̝͚͈̼̯͉͉̘̺̑͆̈́̎̑͌͒̾̔̄̈͌̑̅̋̎̍̊̃́͂̄̇̀̑̿̀̇͊͂͌̆̋̎́͂̏͊̑̈́̈́̽͐̊̀̃̀͑̈̒̈́̐̍̔̀̎̂̉͌͌͆̈́́͋͒̀̇͋͐̔͘̚̕̚͜͜͜͝͠͝͝͝͝͝͝ͅė̴̡̧̨̢̨̧̛̛̛̠̘͕͔̙͓͎̪̠̳͍̹̜̦͓̮̱̮͇̮͈͚͕̼͔͚̺̥͍͉̙̘̱̦̺̜̞̜̗̻͎̩̤̞̬̖̙̭͖̗͚͆͗̇͛̄̏́̿͆́̄͌͂̅͊͐̈́͐̈̀̑̅̆͛̽͑͛̉̈͋͑̈́͐͐͂̑̐̓̿͋͐͛̇͗̽̾͗͊̍͌͛̑̀̌̓̔̈͐̓̃̾̃̅͗̎̆̒͑̑̇̌̃̄̈́̔̎̅̇̄̂̔͒̐̐̓̆͌̃̆̈̓͂̿͌͒͐͌͊́̓̑̀̋́̄̈́̆͑̕̚̕̕̕̕̚̕̕̕̕̚͜͜͝͝͝͝͝͝͠͝͝ͅ ̶̧̡̨̢̢̧̨̧̨̡̧̢̧̨̨̢̧̧̢̡̧̡̡̱̪͍͎̦̝̗̬͖͚̳̤̖͎̟̫͙͕̺̜̝͚̺͓͎͔̟̜͍̯̗͖͚̟̣͔̻̟͈̝̗̳͖̦͈̬͕̱͈̳̣̼̭̟̠̜̦̘̗̝͕̮̟̠̣̹̭̜͍̭̱̭̖̭̦̖̜̝̭͔͕̹̰̼͕̪͇͍͕̭̣̝̟̹̥͔̭̯̼͎̘̤̩̲̠̭̙̘̙̺̹͉̲̩͔̰̬̯̘̫̝̦̖͇͔̙̯̭̤͇̥̻̤̽̑̔͌̐̊̓̀̈́̌͗͌̓͆̃̎͑̅̂͗͐͆̓̉̀̄̌̄̈́͗͆̊͛̊̈́̄̈́̅̐̉̄͋́̽̌̿̑́́̔͂́͋͆́̍̈́͆͋͂̽̀̿̎̾̊̉̄̒̅͆̈́̓̀̃͒̓͊͗̓̉͊͑̿̀̈̓̓̍͒̄̽̽̔͗̏̍̂̎́͛͐̑̈́͒͐͐́̅͊̀̓̄͑̆̔̓̃̏̊̽́̿͑̀̌̈́̕̕̕̕̕̚͘͘̕͜͜͜͝͝͝͝͠͝͝͝͝͝ͅͅͅͅͅc̴̡̢̨̢̛̭̲̹͖͙̲̬͖͕̪̗̳̱̫̰̪̺͖̝̹̰̋̍̅͂̈̒̊͂̈́̎̀͗̆̀̂̈́̄̄͆͋͆͂̿̾̏͋͗̅̔̆̇̓͂͗͆̓̎͆̌̒̓̅̽́͑͘̕͘̕̚͜͜͝͝͝͠͝͠ͅͅͅͅô̶̡̧̢̡̢̢̨̧̨̡̧̢̳͚̹̤͉̖̖̟̺͇̮͉͇͍̪̲̳̙͔̼̤̩̹̦͕̞͓̠̬̝̩͇̫̭̗̣̻̱̙̱̘͓̘̪̜̜̼̳̫͍̗̥̩̝͈͇͈͖͙̜͍̮̻̮̪̞̱̝͔̼̩̮̭̲̪̩̪͉̥̣͖̮͕͔̤̼̤̱͎͓͖͖̟̟͎̖̪̥̳̣̩̪͖̪̤͖͓̬̻̘͓̤̜̲̩̥͍̭̜͉̬̭͕͇̗͉̘̥͇̤͗̓̿̒̉̆̎̐͆͋̆́̀͑̿̓̌͗͊̈́̄͂̔̌͂̇͜͜͜͝͠ͅͅͅm̶̢̧̢̡̨̢̧̧̧̢̨̢̨̢̢̧̡̧̨̢̢̨̛͔͙̺̤͇̹̲̺̺̮̘̞̬̯̤̣̪̞̻̩̣̺̮̬͈͉̞̠͖͇͍͇̘̪̠̣͓̪̰̳͎̠̲̯̖̜̦̜̟̘̜̥̼̖͔̳͔̗̖̠͚̲̳̦̥̰͓̼͈͍̥̞͎͙̙̥͉̣̩̗̰̟̪̠̣͈͓͉͈̗͙͉̥͈̰̭̻͕̣͔͓̼̱̠̣͉̣̹̫̠̠͍̹͎̺͚̮̘̲͉̙͎̹̺͙͙͕̫̩̱̬̗̺̜͕̻̰̘̮̩̮͚̣̥͕̜͔̲͍̤̯̗̟̠̖͎̩̥̦͚̩͙͙͇̺̥͍̬̙̠̯̜̰͎͕̙̪͇̜͇͍̘̩̥͈͙͈̝̩͎̠͔̝͉̭̳̠̳̮̳̰̤̻̫̩̠̳͖͚̅̈͋͗̎̀͗̈́̈̓̏͂̈́̀͗̄̔̈́̊́̓͋̃͐͊͘͜͜͜͜͜͜͝͠͝ͅͅͅͅͅͅȩ̴̛̛̮̹̣̰̜̦̯̬̱̩̝̺̭̜̰̠̤̘̫͚͎̣̲̺̟̳͎͍̙̰͓̱̤̫͍̯̥͈͈͙̼͎̼̣͈̻̝̟̲͖͔̠͖͓̭̥͓̥̙͚̦͍̠͔̲͎̹͚̣̰̲́̎̂̆̑̅͋́̌́́̑͌͂̍̌̿̌́̐̀̿͒̈́̂̾̏̽̂̒͆̿̋̍̽͊̄͂̐́̆͆̀͗̐̋͒͑̆̈̓͊̿͂͑̽̓̈̚̚̕̕͜͜͜͜͝͝͝͝ͅ ̵̢̧̨̡̡̨̨̢̛̛͖̺̳̹̩͚͎̣̗̺̼͖̼͕̠̩̣̟̮̭̱̟̩͇̯̤̞͎̺̮̳͓̪̠̖̰͓̙̝̩̫͙̜̫̖̣̭̪̺̹̙͇̖̩̹̲̤̯͓͖͉̪̗̰̳̟̱̲̩̝̭̼͙̯͚͎͉͓̗̮̭̮̺̲̱̩͓̙̰̖͈̖̻͖͚͚̤͕͓͉̗͚͓̗̭̘̓́̽̊̇̇̑̂̑̏̆͑̐̍̈̄̑̀̋͛͂̓̽͊̈̍͒̉̉́̏̇̽͌̀̾̽̄̇͛̓̽̓͆̈́̃̓̿͂́͗̓̅̆́͗̽͊́̌͛̏̊̑̿͒̈̅̓̓̔͒̀̄͂̇̔̀́̈́̆̄̌̂̽̉͋̀̌͆̎̌͋͋͒̽̏́́̓͆̃̉͐̓̐͋͊͛̆̾̄̔͋̆̌̅̆́́̿̉̽̈́̈̽͛͐͗͐̐͐̑͌͊̍̌̀̈́̔̉̎̕͘͘͘̕̚͘͘̕̚͘͘͜͜͜͝͠͝͝͝͠͠͝͠͝͝͝͠͝͝ͅͅͅͅh̶̛̛̘̦̬̮͕̯͈͔́͒̓̍̿̃̇͑̀̐́͌̈́̈́̾͗̒͛̈͗̂̈͊́͋̀̋͂̀̀̓̏̈͊̆̃͒̊̈̉͌́̅̋̊̃̉̓́̒͐̀̌̓̑͊̔̏̎̐̈́͗͌͂͑̓̋̒͌͐̆͒͌͌́̋͊̅͌̄̏̚̕͘͘̕͘̚͘̕̚͝͝͝͠e̶̢̡̧̧̨̢̢̟̜͇̗̣̙̞̩͚̭̳̝͕͔̥͚̮̱͕̥̺̪͖̪̘̩̹͉̣̹͕̯͚͓͉̹̪̻͎̩̝̭̘͈̲̗̯̖̳̫̮̰̼̙̬͈͎̯̫̙̤̮̗̩̟̩̙͕͔̥̦̝͖̫͕̪̖̱͓͕̩̩̲̜̬̼̬͈͆̍͋͆͑̽͝ͅͅͅͅr̴̨̧̡̢̢̨̧̢̧̧̡̢̛̲̜̬͇̼͚̬̪̘͖̣̝͖͚̙̦͖̜̤͈̜͕̳͉̼̬͚̣̝̺̭̗̩̲͎͍̘͍̻͙͇̲̫̱͇͖͇̦̥̳̹͓͚̱̯̟͓̙̗͈̙͈̲̹͖̘̗̙̬̮̼̦͇̮͙̭̪̻͍̞̖͕̲̬̣̯̟̲̻͎͎͇͈̟̣̩̺͔̗͕̦̹̼̠̥̦͙͓̙̯̣̝̜̼̳̲̯̹̩̪̤͙̻͈̤̺̮̖͚̩̱͚̞̗͇͇͙͚͚̟̝̥̐̏́̈́̔̓̐̍̇͂̈́̈́͑͐̋̒̔̿̎͋̅̓͌̉́̓͂̔̔́̄̏̾̈́̈̏̐̅́̀͐̽͌͐̔̀̍̿̃̒͛̇̈̑̅͌̌̀͗̀̅͐͗̓͛͘̚̚̕͜͜͜͜͝͝͝͝͝͠͝͠ͅͅͅe̶̡̢̨̨̡̧̢̧̢̧̧̨̡̡̨̡̧̢̡̢̡̡̨̧̨̛̛̙͓̺̠̳͓̳͈̬͈̘̬̰̱̲̦̰̱̣͈̬̺̼̣̬̲͍̲̜͙̻̱͍̞̼͕͍̖̭̝͈̗̟̟̟͍̜̭̰̦̗̟͖̙̺͉̪͖͙͈̩̩͇̦̤̙̥̯̠̭̭͎̻̯̣̪̟̰̜͚̗̼̲͖̥͎̮̘̜̝̖̣̳̮͙̜̩̼̩̥͚͈͍̮̮̥͓͖̦̫̯̹̘̟͚̜̮̰͕̣͙̻̱̲͔͓̜̹̗͇͍͔̳̮̺̝̘̘̭̰͖̤̦͉̼̰̝͉̠̳̩̬̹̭̥͖̞̣̗̫̼̟̘͇̟͙̱̟̺̘̪̱̲͔͈̥̮̱̫͍̝̦̫̹͈͈̖̘̯̭̼̹̘̘̪̤̠͙̺̫̰̳̝̞̳͍̣͔̰̭͇̯̼̺̲̫̩̠̙̳̘͚͖̖̘͉̼̹͋̓́́̀̈͑̅̊́̐́̈̿̐͆́̓̈͗̑͛͌̿̊̊͆̑͂̋̈́̓̑͂͋͑͌̃̅̈̈́̅̐͒̈́̓̈́̿̀̄́͋͊̿̌̾́͊̀̈́̏͒͂́̂͛̀͆̍̄́̃̍̈́̑̂̅͑̊͋̓̔̈̉̍͂̈́̂̌̄̔̈́̏̏̒͐̂̓͊̀̀̀͆̍̏̆̇͊̄̈͗̌͊̈̋̇̄͌͛͒̅̓̐́̆̇̈́̔̑̀̾̑̍̎̂̋͛̉͋̿̅̍̈́͆̈̽̋́̽̈́͒͋̏͑͌̋͊̎̎̀̒̅̚̚͘̕̚͘͘͜͜͜͜͝͝͝͠͝͝͝͝ͅͅͅͅͅ ̸̨̨̧̢̨̧̨̢̧̢̡̨̢̨̨̡̡̨̡̢̧̨̡̡̨̨̧̛̛̛̛̭̬͚̺̪͓̻̙̲̠̺̠̞̠͖̲͇̞͉͕̳̲̖̣̺̣̱͕̱̭̫̻͔͈͙͉̥̭̠͈̥̖̦͇͙͖̗͇̼͚̥̮̩̯̜͔̗̯̮͕͖̳̖̻̹̟̘̞̤͍̪͙̻̗̼͙̩̪̯͉̝͕͈̤̰̫̙͙͍̻͖̣̤͖̤̯̫̠̯̪͇̱̤̥͔̥̦͙͍̤̻̮͉̱̼͕̟͕̩͈͙͓̩̦̹͙͓͎̼̼͎̠̣̝̗̫͎̫̥̞͉̭̞͙̣̭̗̰̬͙̜̗̫̻̞͎͇̝̪̘͔̗̳͓̰̝̱̩̳̫̺̝̟̯̩̭̖̯̺̤͚̙̯̮̗̝̠͇̳̹͙͍̥͙͍̣̣̳̪̗̫̙͇̗͕͕̜̘̟̩̻̺̫̪̥̦̠͙͓͔̹̳̗̗̳̗̰̝̗̹̙͇̱̘̝͕̼̯̙̰̜̻̜͙̝̥̳̫̬̭̩̓͋̔̾̀̌̓̽͋̈́̐͒̈́́̀̋̏̋̐̈́͋́̊̌̃̓̄̉̔̆̉̓͑̈́́͋̈̍͗̐́͂͒͐͑̔̃̓̿̈̑͗̍̆͑͆͛͐̑̑͊̽̽̉̑͑̄̍͋͌̈́̽̓̽̽̌̒͂͌̅̈́̇̍͑̏̅̀̔̍́͋̀̉̒͌̍͋͛̾̈́͋̉̂̆̄̍͑͋̇͊̀̄̆̏́̔̆̐̏̐̈̾̎͐̀̅̿͆͑́̉̏̄͛̈́̓̍̈́͗̃͑́̏̓̓̽̅̌͗̇̓͒̌͛̓̋̏͐͋̈̏̃̓̌͂̋̈́͋̈́͐̂̃̽̓̂̽̍͗̈̌̄̑̆͋̒͗͊̔̔̎̿͂̆͐̓͋̈̉͌̽̎̈̑̆̉̀͑̑̀̅̑͑̓̄̐̍̎̎̏̊̂̎̈́͌̆̂̈̒̅͌̍̔̓̀͂͆̌̅̈̚͘̚̚̕̕͘̚͘̚̚̚̕͘͘̚͘̚̚͜͝͝͝͝͝͠͠͝͠͝͠͝͠͠͠͠͝͝͝ͅͅͅͅͅͅͅͅͅ ̶̨̢̡̛̤̞̱̠̱̻̗̱̗͉̳̲͚̰̻̥̗̝̥̺̲͕̗͓̰̫͈̖̠̮̮̭͉̿͑̉̌̎̈̈́͂̈̌͌̃͆͛̔͐͋̓̄̓̽́̿̊͊͌̒̓̒̒̅̈̀̈́̉̀̏̔̊͛̿̐̈̓̐̋̔͒͊́̈́̈́͛̉̓̀̓̉͛̑̿̐͑̏̈́̓͌́̒͒̋̀͐̓̓̔̍̀͐̚̕͘̚͜͝͠͝͠͠͠͠͠');
+};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   // console.log('                                                                                                                                                                                                                                                                                                                                                        ̷̧̨̡̨̨̡̨̡̢̛̛̛̛̛̛̛̥͚͉̙̦̠̙̘͉̖͔̜̬̦̻̥͖̖͙̰̮͙̻͚̱͖̳̩͍̙̩̯̖̮̺̜͍͍̪̠̲͍̗̦͍̪̫̎́̀̀̒̃̽̑̉̉̐̏͛̋̀̂̽̎̐̃̀̾̆̆͆̈́̏͑͌̓̐͋͆͗͊̒̉̋̃̊̍̇̉̌̔͑͆̆͆͛̾͒̀͌̂̿̄̊̅͆̈́̄̅̃͋̊̍͐͑̏̋̄̔̏́̐̽̽̾̉͆́̔̒͑͊̅̇̾̏̏͗̾̊̽̈́́̃̽̈́͆̈́̑̿̊̒̆̑̐͒̊́̽̆̄̈̾̔̃̓̃̉͊̿̉̈́͗̔͂̌̀̿̀̽͐̈́̋̑̆̋͋̉̈́͂̓̒̿͋̇͂̓̎͌́͊̓̽̈́̈́̃̊́̆͂͒͋̀̈͑̉͊̆̾̌̾͋̿́͋͐͛͑̈́̈͊̄̔͂̎̂͗̈́̑̓̈̇̌̔͊̒̈̈́̓̐̍̌̿̈́̈́̔̏̂̀̐̍̔̓͗̅̒̌͌̿̈́̌̀̎̐̔̍̾͒͋͑̾͆͋̌̒̓̚͘̚͘̚̚̚͘̚̕̚̚̚̚̚̕̕̕̚͘͜͜͜͝͝͠͝͝͝͝͝͝͝͝͝͝͠͠͝͝ ̶̡̢̢̨̨̢̡̡̡̢̨̡̨̢̢̨̡̨̢̡̧̧̡̛̛̛̛̛͚̰̺̙͚͇̻̖̜͚͍̭̘̥̹̮̻̙̹͉̬̺͉͎̠͓̲͙̤̩̦̯̭̳̭͔̜͚̹̣̬̜̞̱̮̦͙̮̖̥̟̘͇̫̠͎͖̹̟̪̲̳̻̝̩̫̥͔͈̲͎̖̝͙̙̰̼̬͉̫̲͇͈̙̪͔̬̟̘͓̖̹͇̺̭͓̻̠̭̰̰̫̠̪̻̜̜̮͔̜̙̺̘͖͍̲̭̰̼̦͓̣͎̦̟͖̭͇͇̦̯̭̺̦̬̯͖͕͉̲̠̻̗̤̲̫͖͕̫͔̯͎͙̦͇̼͉̘̠͑̓͗̔͋̈́̏͛̎̏̄͆̀̈́̔̑̀̒̍́͐̈́̔̉̋̔̽̂̑́̀̆̋̊̒̂̈̓̉̔͗̄̈́́́̓̎̀͐͌͂͗̔̓̔̿͋́̈́̂͛̍̎̆̓̃͒̾̽̊̅̈̆̈̾̈͊̓̍̍͂̽̔̿̃̓̐͋͋̄̄̎͋͆̅̈́̀͂͋͆̎͛͛͐̍͊̎̋̾̈́̈̀̈́͊̀̋̃̈̏̄̅͗͆̏̊͒͛̀̀̃́͂̆͐̎̂̓͐́͗́̕͘̚͘͘͘̚̚̚̚̚͜͜͝͝͝͝͝͝͝͠͝͝ͅͅͅͅͅͅy̵̢̡̧̧̧̨̧̨̨̧̢̧̨̛͉͔̼̮̳͍̠̰̹̰̝̲̰̜̠̹̫̝̯̬̯̹̗̬͙͚͚̱̜̯̫̯̩̜̞͕͇͚̺̰̦̺̮̭̲̦̞̲̻̩͉̲̖̪̣͇̠̭̰̬̞͖̣̼̙̮͓̩̩̲͕̰̲͙̲̘̳̟̰̘̱͙̭̦̺̹̩̓̅̓̌̿̈́͋̄́̈̓͊̔̔̊̄͋̎̆̂̿̐̽̍̽̽̉̈́̑̄̍́́̋̾̈́̆͛̕̚̕͝͠ͅo̴̧̢̨̡̧̧̢̢̨̧̡̧̡̢̡̡̧̡̡̡̢̡̨̧̪͈̞̖͈̥̞͕̘̫̤͉̘̟̳̜̗͙̠͚̠̫͉̼̪̖̹͓̗̮̗̗̞͚̬̙̠̰̮̠̮̹̖͓̞̠̜̹̲̫͚͖̩̺̦͕͉͍̪̜̱̠̝̦̞̤̘̤̞̝͇͙̘̟̗̮̟̤͉̪̜̥̩͖͍̯̩̪̬̮̘̲̖̠̯͖̠͎̱̟̪̘͚͈̹̱͕̟̫̼̭͔̠͉̞͉̫̘͍̖̠͖͎͙̘̼̫̺͚͈̩̟̟̖͉̼̗̳̙̤̜̠̬͍̘̭̬̮͍̲̣̤̱̘͍̥͈̞͕̞̮̗͓͖̙̞̖̣̺̦͚͗̋͜͜͜͜͜͜͜͝ͅͅͅͅͅͅứ̶̛̭̈̉̀̅̈́͑͆́̉̉̌̾͂͗̂̂̒́̈́͐͌͋͒̿̐͂͆̿͛́̊̔̐͑͑̄͂̉̈́̌̌̀̍̀͆̑̏̄̇̈́͊̉̏̒͐͌̊̇̍͌̃̽̀̔̉͛̈́̊͑̏͛͋̇̓̎͋̈́̓̍̅͐͑̄̆͌̉̌͌̅̀̎̍́̅̉̀̍̂̂͊͋̊͒̏̇͋̈́́͒̎͑̾́́́͑̏́̅͆̄̋̑̔͆̈͌̓͗̒̉͂̀̓͆̍͑̈́̊̓̈́̍̉͂̒̏̎͑̅͐̏̿̓̈́͗͋̐̅̊́̀́̔̂̀͌̈́̋̀͌̐͆̊̏͒̊̉̇͌̔̅̀̇̔̔̌̕͘̚͘̕͘̕̚̕͘͘͘̚̚͘͘͝͝͝͝͝͠͠͠͝͠͝͝͠͝͝͠ ̵̡̢̨̢̢̨̨̨̡̨̧̢̨̨̡̧̨̧̨̡̛̳̻̹͓̰̘͇̖͙͈̗̼̩͓̼̼̩͍̟͚͉͕̪̺̰̲͈̪͎̭͚̹̱̪͎͎̻̗͓̙̙̝̯̝̱̱̪̩̝̦͚͓̦̳̮̳͉̳̙͉̻̫̺̰̭͍͉͉̯͍̝̤̪̜͓̼̯̰̜̹̲͍͖̼̯͉̮̬͎̤͇̙͈̩̖̮͈̺͖̥̟͓̹͖͕͍̼͖̼̯͈̯̣͈̜̲̺̳̗̮̺͇͕̞̪̹̲̟̝̩͎̦͙͚̥͓̣͇̻͙̳̙̲̰̰̥̘̩̬͔͎̠̥̭͍̣͓͓̼̻̝̲̲̗̼̭̼͙̬̞̟͔̤̖̞̞͉͔̭͚̞̹͙̩̗̥͔̳̙̙̜̥̩̞͕̩͈̳͚̜͚̗͎͕͙͍̬̫̣̩͈̻̖̙͇͎͔̼͈̖̫̱̮͕̦̫̗̞̠̰̜̬͙̘̥̘͖̼̻̤̈̍̿̃̀̿͐̐͑̈́͛̇̈́͗̐̂̔̿͊̉͒͒̍͗͜͜͜͠ͅͅͅͅͅͅͅͅͅs̷̡̧̡̡̢̨̢̨̡̡̛̛̛̛̛̗͚͕̱̟͕̣̜̮̯̼̰̖͓̟͉̪̪̹̟̞̳̖̗̩̭̙̦̠̦̣̲̫̗͖̻̹̗͈̳̳͚̭͍̝̥̪̮̤̟̲̤̫͔͙̬̘̹͙͉͙̦̺̙̠͎̝̗̹̦̘̖̯̫̫̭̟̫̞̦͉͉̺̻̯͔̹̹̖͇͙̩̙̗͊̊́̋͆́͊͂̑̔̐̐̒̉͒̔͑͂̏̇́̿͆̓̈́͌̐͛̆̍͒̓̓͑͆͂̄̄́̓͌͒͌̓̍̀̐͂̎́̌̾͑̈̈́̅͊̈́̎̆̂̽̈̏̈́̒́̅͊͑̿̿͌̈̊̍̎̈̃͋̽̐͌͑́͊̓͐̾͐̏̎͊̏̈͒̃͗̌̑͌̈́͋̉͆͐̀̐̏̂̆̀͐̍͆͂̊̋͋͋͋̀̔̅̔͂̎̈́̃͗̊̋̈̎̓́͊͛̀̀͆̎̈͆̎͋̒̆̈̈́̑̎̔̿͐̌̒̎̈̈̀̀́̈́̓̏̓̀̂̿͑̾̉͌̈́̈́͂̓͗̊́̔͛͛̈̑̐͆̌̊̈̊͒̈́͂̅̈́͛̀̓͊̑̇̉̾͗̅̏̉͆́̈́̈́̓̉͋͆̈́͑̒̎̉͛̿̈́͗̕̕͘̕̕̕͘͘̕͘̕͘̕̚̕̕̕̚͘͘͘̕͘͘͜͠͝͝͠͝͝͝͠͠͝͝͠͠͠͝͠ͅͅͅh̷̢̢̨̛̛̛̛̛̛̛̛̙̬̬̲̣͕̼͇̩͍̯͎̝͉͓̣̩̹͔͉̬̳̹͉̤͇̻͔̲̟͔̫̥̦̣͇̝̺̰̼͖̗̳̞̰͉̙̻͓̣̖̩̗͔̥͈̹̜̻͉̙̟̘̘̰̖͖̝̤̜̲̞̃̈́͋̇̈́̈́͛̉͋̔̐̔͒̓̀͑͗̾̂̄̔͗͋̏̅̂̔̏̌͋̉̌́͑͆̍̔̾̄͐̀̾̈̓̓̾̉̀͗̎̈́̌̾̈́̏͑̑̈́̑̓̇̈̐̏̐̾͒̇̓̍̏̂̀̀̔̑̈́̈́͂̽̀̓͑̂̑͛͛̒͒͆̊̋̃̒̋͊̀́̓̏̋̄̄̈́̓͛̏̽̒̔̾̓̎́̃̀̈́̓́̂́͑̀̄̇̂̅̌̀̐͐͑͛̀͋̌̿̋͗̈́͒͋̎̔̅͆͛́͊͛̋̐̈̀̊̉̌̐̍̓̿͌̐͆͒͒͒̈́͒́̈́̋̃̆̇͑̈̔͊̈́͒̐̆̉͂̿́́̈͆̍̊̊͘̚̚͘͘̚̚̚̚͘̚̕̚͘̕̚͘̕̕͘͘̕͝͠͝͠͝͝͝͝͝͠͝͠͝͠͝͝͠͠͝ͅͅǫ̷̢̨̨̢̨̡̢̧̢̢̧̡̨̡̡̡̡̢̡̛̛̛̛̛̛̛͎̦̻̫̞̱͖̝͈̩̰̝̪̳̪͖̮̜̼͚̻̙̭̣̜̟̰̲̮͕͙̳̪̲̟̹͇̼͚̙̰̖̻̘̹͙̰̞͍͎̝̬̱͇̪̪̹̠͚̗͎̰͇̜̦̙̗̗͉̣͚͉̙̳̲̱̳̺͈̞̤̲͉̰̰̜̩͍̫̜͎̗̖͙̰̯͉͔̩̺̝̫̱̮̻̺̤̜̱̳͍̱̯̘̩͙̥̳̩̦̟̫̣̳͈̘͕͔̲̬͖̥͕̳͙̮͕͈͓̣͇͈̏̌̆̃̃̇̋̐̐̈́͆͗̈́̇̉͒͒̒̄͂͊͆̇̃̈́̈͆̈́̓͊͆̈̉̏͂̔̉̃̓̅̂̒̑̓̿̄́̄͒̏̈́̾̀͆̑̍́́͑̎̅̽͋̋͑̿͋͌͛̍̏̑͐͒̃̈́̈́̓̍͛̃̈́͌̏̅̔̄̈́͛͑̈̓̇̿̾͂͒̍̈́̒̀̍̍͆̇̿̑͗̐̀̒̀̇̈́̐̓̐̇̀̍̒͌̈̏͆̎́̈́̈́̆͌̈́͗̅̆͊̔̐̄̽͐̏̀͒́͌̇̀̈́̓̀̃̓́̇͑͌̌̿̄̆̌̽̐̀̆̈̈̂̓͂̐̃̈́̊̓͘̕̕͘̚̕̕̚͘͜͜͜͠͝͠͠͠͝͝͝͠͝͝͝͝͝͠͝͝ư̷̢̡̧̡̧̢̨̢̢̡̨̢̧̡̨̨̧̡̨̧̨̛̛̛̛̛̛̛̠̺̞̖͎͙̥̬͈̼̻̟̹̗͈͚͖̘̱͎͎͈̺̞̬̖̻̠̮̣̩̠̙̗̞͍͉̫̟̝̲̬̻̫͍̙͙̲̼̙̙̙̬͖̘̮̻͙̝͔̰͕͖̙̼̜̤̯͓̠̪̹̥̺̘̰̠͕̯̺͔̮̦̺̪͉̱̭̩̩͎̖̳͈̫̗̝̰͕͎̮̳̳̪͙͚̟̫̫̺̦̟̲̙͚̪̺̲̼̹̝̼͙̰͈͓̩͕͕͉̪̼͍̪̲͈̬̞̮͖̟̙̹͓͕̤͚̜͙̳̭͇͍͈̝̭̼͙͖͇̹̥̗̮̞̬̮̟̞̣̙͖̣̺̻̩̜̬̥͖͔͉̙̹̤̤̹̱͔̖̹͚̻͕̞͚̦̪̙̱̬̞̘͙͍͚̘̯̗͍͎̱̫͓͋̔̑̉͑͌̓̆̂͗͗̽̏̍̂̂̉̐̓̇̂̑̂͌̑͂͋͒͋̊͑̓͒́̓͆̒̽͆̾͋̈́̆̌͋̃͑̐́́͐̌̈́́͊̋́̀̆̀̽̃̇̎̇́̋͐͂́̓̅͋̐͒̍͌͋̔̆̑̊̉͆͐̏̽̍̓̑̉̔̀̐̊̃̽̔̌̈́̈́̂̉̑̈͐̌̾̀̿̎̅͑͋̿̋̂̍̉͒̈́̉͛̓̿̐̐͒̎̐̆̏̑͌̈́̏̀̓̾͊͑̊́̂͂̈́̉̎̒̏̾̂̋̂̋̇͋̍̓͑̓͛̍̐̐̈͌̊̾̓͒̔̽̈́̔̒̑̌̃̂͐͌́̈́̾̌̾͐̾̅̈͑̿̀͌̔̃͂̑̃̑̀͑̍́́͌̈́́́̌̆̂̅̈́̈́͋͑́͛̾̈͋͐͐̉̿̈́̋̓̒̅̋̈́͂̃̇̊̐͛̎̇͑̄͂̋͆͘̚͘̕͘͘͘̚̕̕͘͘͜͜͜͜͜͜͜͜͜͜͜͜͝͝͝͝͠͠͝͠͠͝͝͝͝͝͝͠͝͝͠͝͠͝ͅͅͅͅͅͅͅͅl̶̢̢̨̢̧̧̧̢̢̛̛̛̛̛̛̳̬̳̤̗̗͕̰̬͓̩̮̭̙̺̭͇̳͓̼̣̹̪͉̰͉̰͕̣̪̖̣̝̩̙̥̮̝̠̮͇̜̤̥̙͚̺͖̱͎̯̤̩̞͙̥̟̘͍̰͉̞͍̳̯͚͚͓̗̱͔͔͍̜̹̬͙̰̠͙͉͉͎̝̞̬̜͖͇̪̮̤̖͈̪͉̬̮̮̖͙̬̘̻͚̞͇̪̥̥̗̠̹̲̫͕̙͓̩͓̗̗͙̪͙̍̈́̋̎͂̓̐͋̄̍̂͛̑̈́͐̓̾̈́̏͊̃̌͒͒͆̐̀̀͑̊̑̔̏͐͂̈͐̏̌͋̅̊̅̎̔̍̏̇̌̀͒̐͛͌́̏̂͆́́̓̽̽͐͒̾̓̅̈́̋̽̿͋̅̃͂̈́͑̑̀͌̈́̒̍́͛̉̿͌̌̓̄͛̿́̉͂̈̀̏̓̉͂̆̃̃̆̏́͋͒̉̈́͋̎̀̈̃̈́̋̃̈́̃̔͌́͒̂̒́̍͂́͗͌̎͗͌̈́̔͂͌̈̂̉̾͊͗̐̓͑̋́͊̎̐̽̎͛̇̈̆̄̎͗̚͘̕̕͘̚̚̚̚̚͘̕̚͘̚͝͝͠͝͝͝͝͝͝͝͝ͅͅͅͅͅͅḑ̸̨̨̡̨̧̡̢̢̧̧̡̢̢̢̡̨̡̡̧̨̨̡̛̛̛̛̛̛̖̺̲̼͉̬̘͕̝͍̳̯̳͚͔̰̺̝̮͙̼̬͓͖̹̘̳̞͎̳̖̦̥̦̮͎͕̟̦̥͙̙̝͈͍̗̱̪̥̲̘̦͔̯̳͕̪͚̠̘͔̗̟̻̯͕̳̘̝̬̯̖̦̞̜̻̺͕̹̰͇̝̟̯̙̪͔̮̼̳̥͉̥̟̝̪̼͕̠͉̜̩͉̬̣̹͖̤̖̮̞͍͎̖̫̺̩͎͍̬̩̯͇̗͚͇̩̺̖͓̱̭̪͇̭̱̟̘̙͚̣̱̖͇̯̘̭̖̗͎͙͈͚̫͉͔̫̠͈̗͉̯̪̰̘̞̖̞͎̜̻̻̳̝͚̬̙̰̻͓͙͈̮̺̬̼̼̰̺̭̮̟̤̦̥̜̙̲̱̭͇̮̞͚͓̻͎͈̙̰̻̻͚͕̝͈̜̫̥̱̞̍̀̋̊̈́̾̊̔͗̾̑̏͗̒̓̏̒͗̃̒̄̏̓̓̎͒̑͆̒̽͑̽̋̒͒͒̓̄̏̍̓̿́̈̈̐̈̓̈́̽̀͌̔͊̊̈́͒͒͛̂̍́͐͛̈͗͐̇̄̉̈̐̉͌͑̒̂̀̔͂̈́̑̔͊̾͐̊̒͑̀̒̅̿̎̋͋̾̎̋͊͌̐͛̈́̎̇͋̎͊͌̌͆͒̍̈̄̓͋̓̓͊̆́̒͘̚̕͘͘̕̕͘̚͘͜͜͜͜͜͜͜͜͝͠͝͝͝͝͠͠͠͝͝͝͝͝͝ͅͅͅͅͅͅͅͅ ̸̢̢̨̡̢̛̛̩̝͔̣̳̲̙̤͍̦̠̝̻͕̤̦̖̲͈̹̳̩̟̜̫̩͕͍̣͓̱̝̫̬̙̬̖̦̙̼̗̱̳̙̱̝̜̫͔̟͔̲̫̞̗͔̩̜̘͉̣͚͓̟̭̳̱̟͎͙̻͇̻̜̭̩͖͚͇̩͉̞̥̙̜̘̼̪͙̼̟͕̥̥̗͍̫̯̜̣̍̆̓̾̐̈́̓́͑͂́̃͛͑͂̎̅̈͒̅̅͒͐̿̒̏̋͗̆̎̎̓̉̓̈́̈́͆̂̎̂͌̿͛̒̎́̑̐̏̊́̓̍͗͊̌͌͊̿̓̿́̓͑͐͑̋̈́͐̂̊̊̓̔̾́̄̄͑̾̿̈́͌͐̈́͂̽͊̈́̽̎̀̈́̾͋̇͛̃̃́̑̅̀͊̈͑̍̓̿̋̒̊̌̂̄̑̎̀͐́̎̅͆͛̈́̈́̊͊̏̈͒̈́͋̏̈́̾͒̉̊͋̉̄͑̔̏̈́̔̎̓̂̌̉̑̀̄͊̍͌̊̍́̅̌͆̉͂́̓̂̈̑̓́̏̎̚̚̕̕͘̕͘̚͘̚͜͝͠͠͝͝͝͝͠͠͠͠͝͠͠ͅͅͅͅn̶̨̨̡̨̢̢̢̨̨̨̡̧̧̨̨̨̧̧̨̧̧̢̧̨̢̡̡̡̨̧̨̛̟̬̝̦̱̺̙͔͇̭̬͚̤̳̭͈͔̬̝̻̬̯̦̤̯͎̜͚̤͓̬̩͉̼̳̪̗̳̘̜̠̼̤̗̣̞̖̻̱̦̫̦̳̱͇͍̣̩̜̹͓͈̣͇̠̹̪̜̟͇̮̰̦̘̻͙̳̘̠͕̳̠̙͖̜̗̝̮̘̲̼̯͙͇͉̘̝̬̱̪͉͖̘̣̥͎̱̭͙͔̳͕̮̰͔̯̼̮̳̣̩͚̼̲̻̖̥̖͖̲̘̼͇̣̣̘̻̬̣̫̪̥̪͉͇̝̙̯̣͎̦͎̟͙͓̳̘̠̻̤̭̦̣̰͍̜̖̫̖̲̟̬̰̥̼̥̦͎̲͖̼͚͔̻̭̤͍͚͔̲̱̝͍̗͎̝͙̙̩̼̮͇̩̹̤͚̋̆̀̆̉̏̎̏́̄̔̿̓̂̈́͋̈̈̋͑̒͑͒̒̍͛͋̀̇̑̓̔̿̾̈́͊̅̕͘̕͜͜͜͝͝͠ͅͅͅͅͅͅơ̴̢̧̢̨̢̨̡̡̢̧̧̢̡̨̧̢̢̢̧̨̧̡̡̢̨̢̨̛̛̛̗̩̩̭̭̪͈̥͕̳̞̫̲̱͖̭̻͇͇̗̮̫̻͇̤̥̗̯̟̼̥̙̳̱̪̗̖̫̫̳̻͚͙̬̝̦͕̪͍͙̞͚̫͍̜̠̦͚̲̤͈̳͖̝̩̼̠̩̟̮̼͈͕͖̘̖̰̼̤̖͔͈̟̺͈͇̺̟̰̠͚̥͓̫̟̤̺̜͚͓̜̤̭̣͉̟̼̙̘̜͈̗͇̯̣̲̬̟̟̗͕͓͇͚̮͓͍͓͔̪̙͚̯̥͇̯̥̖̼͓̣͔̯̠͎͚̥̘̞͚̪̭͍̙͕̻̤̩̥͎̲̤̬͕͎̭̳͉͈̖̯̞͍̘͓̜̯̜̼͉̜͖̯̩̙̐̑̓͒͐̈́́̓͆̍̈́͐̓͛̈͑̌̈̈́̌́̿͋̐̏̑͊̈̽̽͛̈̀̆̅̈̓̌̅̓̇̆̉̽̊̂͐̌̌̊̈́̋̂͛̅͊̈́̀̆͐̉̈́́̂̇̏̌̈́̇̀͗̍͗̌̔̽̈́͂̋̊̏̈́̈́̿͐̔͌̆͗̊̎͂͛̐̅́̓̊̇͌̇̒̾̋́̌́̾̀̊̃̽̌̆̌̑̈́͌̐̏̄̆̋̔͆̏̂͛͒͆̋͌̆̆̈̔̄̒̔̕̚͘̚̕͘̚͘͜͜͜͜͜͜͜͜͝͝͝͠͠͝͝͝͝ͅͅͅͅͅͅͅt̶̡̧̧̧̡̢̧̡̧̢̡̡̡̢̡̨̧̨̨̨̡̛̛̛͇̦̠̣͍͕͚̬̬̩͖̺̯̤̲̯͚̼͕̬̼̠̺͍̤̳̰̫̫͚̥̺͔̟͍̩̻̩͉̞͖̣͖͈̯̥͈̰̟̣̫͎̜̦̮͓̩̙̻͓̟̫̟̥͈͈̱̞̰̳͍̯̮̬̦͓̫̬͈̥͔͖̞̘̺͔̲̬̞̰͇̺̻̪̙̩̫̹̭̮̩̯͓͚̹̞̯̟̥̳͓̹̤̖̲̖̻̳͕̮̜̳̱̬͍͙̟̖͇̬͉̩͔̥̳̲̜͕̗̜̥̖̣͓̙͚͓͉̺̰͍̻͉̤̪̘͖̰̻̺̠̥͕̤͎͈̦̺̘̳̮̘̯̘̳̞͚͎̱̭͍̞̦̗̩̤̤̻̱̱͔͉̳͔̖͚̯̫̰͍̙̱͇̲̭̟͉̭̗̫̟͇̗̫̱̹̙̯͖̲̭̳̹̣̭̬̥̪͓͇͙̯̰̻̜̪̻͖̺̗̘̮̳͔̪̋͗̀̅̌̐̔̏̆̄̓̔̽̇̎̽̆̔̄̀̉̑̓͐̎̇̾͋̅̃͛̈̈̉͛͊̉͆̉̈́̎̐̓̔͋̄̃̾́̓̈́̾̇͗̒̀̂̃́͆͋̓͂̊͂̔̉̀͊̒̄͋͌̇͌̈̍̔͛̽̆̓̃́́̇̃͋̆̑̓̔͛͆̿̀̉̓̂̀̒̔͆̈͆͌̒̀̑̾́̇̿́̀̽̎̏͂̇͆̀̐̐̓̇̀̀͗̅̀̃̌͊́̈́̂̀͛́̀́̒̂̏̏̑̐́̾̒̇̐̊̒̍̏̕͘͘̚͘̕̚̕͜͝͝͝͝͝͝͠͝͠͝͝͠ͅͅͅͅͅͅͅͅͅͅͅͅ ̶̢̨̨̨̡̧̨̨̢̡̧̢̢̧̧̧̡̨̢̧̡̨̢̡̨̨̨̢̛̛̛̛̛̛̛̛̛̠̳̖̗͇̱̞̯̫̲̩̩̹̞͔̘̦̘̹̭̭̩̩͇̗̤̝͎̹͎̣̲̪͇̺̥̣̠̩͍͔̹̜̱̳̹͖̠̹̬̜͈͇̤̰͎̮͔̜̦͖͖̭͚̙͔̤͉͙͍͉̰̲̟̯̭̺̹̟̬͉̜̥͖̙̘̰̜̪͉̜̜̭͖͖͍̻̫̫̤̥̙̬͕̱̹͔̘̟͉̭͙̫̬̻͙̘͍͇̲̞͕̗͉̣̭͍̱͓͔͎͓͉͚̮̜̦̲̯̫̙̱̖͔͕̙̺̺̦̫̠͉͚̫̗̠̭̟̬̭̰͓̺̱̘͈̘̱̠̖̣̫͉̗̖̣̥̖͓͎̗̘̜̼̯̗̞̰̻̰͙͕̭̺̹͂͊́̉̎̔̅̏͒̽̐͆͒̌̋͂͗́̀̇̋̏̀̓͆̒́͋̽͋̍̋̂̋̍͗̒̈̐̍̒̋͋̉̿͛̋̃̀̆̾͛͗͊͗̂̄̍͆͂͐̎̑͑̿͗̈́̅́͐̄͗̄͛͛̈́͐̆́́̒̉̒̔̋̐̎̈́̀̂͛͊̊͗̄̈̀̀̆̽͑̆͑̿͂̌̓̿̈̂̾̇̋̍̃̃̅̉̂̓́̀͛̾̍̆̽́̑̐̎͂̔͂̊̈́̌͒̅̔̄̾̈̄̓̿͋̉́͗̓̄̓̅̾̈́̀̌̍͆̀̐̏͐̚̕͘͘͘̕̕͘̚͘̚̕͘̕͘͘͘͜͜͜͜͝͝͝͠͝͠͠͝͠͠͠ͅͅͅͅͅͅḩ̷̢̡̢̧̨̢̡̡̡̨̧̧̨̛̛̭̙̫͈͉͓̮̞̙͉̘͈̻̼̤̜͇͇͖̤̤̤̱͈͖̟̰̣̻̬̝̙̺͉̪̞͈̞̻̼̰̬̮̥͓̯̞̣͖͉̮͈̩̹̝̰̲͓̝̺̟̱̹̺͚͙͇̟̞̼̞͔͖̯̖͕͓̺̣̯̪̣̝͉̥̗̣̺̯̯̞͉͕̲͖̱̺̱̳̖̥̦̠̫̲͕͈͖̭̖̖̬͕̘̥̫̥̳̤̺̳̥͍̠̘̯̣̭̱͍̬͍̞̯͓̺̲̫͍̭̻̩̮͈͎̞͕̮̬̣̙̟̖͙̺̬̾̀̍̽́̒̃̈́̂̈́̈́̊̒̇͊̍̓̌̈́̿̍̀̃͐͆̏̀͗̓͑̾̊̍̂̏̿͂̊̀̈́͆̍͗́͑̔̉̈͊̈́̔̀́̾̅̄͊̊̽̌̽̀̾̇̍̿̈́̋̐̾́͆̈́̄͊̌̀͌̓͋͛͐̏̂̓͋́̀̈́̔͂̎̓̈́́̈́̑͂̋̃̑̒̋̒̌̒̎̽̑̕̕̕̕̚͘̕̕͘͜͜͜͠͝͝͝͠͝͝ͅͅͅͅą̶̧̢̡̧̢̧̧̨̡̧̢̢̧̨̡̨̡̧̡̧͖̻̰̞̘͓͈̫̻̞̫̹̤̺̩̙̙͙̜͔̩̦͙͓̩͇͇͚̫̯̮̤͉̳͔͈̠̺͇͍͙̠̻̞͓̺̻͚̯̭͚̗͙͔̠̯̯͍͉̤̣̹̼͍̮̗͖̝̲̦͓͍̖̟̰̬͎̻̫͈̩͍̩̹̙̲̤̻̮̻̻̪͖̝̣͙̯̦̖͇̠̬͖̪̮̝̪̪͓̭̮̩̥̖͕̳͎͈̞̲̙̪̪̣͖̳̞̹̪̤̫̯̯̞͈̪̻̖̘̣̜̠̦̯̝̮̥̪̪̫̖̤̱̩͓̺̳̜̩̘̜̜̺͓̥̘̻̞̫̪̹͔̩̣͔̻̜͕̙͈̗̊̈́͐̆̑͐̄̄͗̏̿͆͗͛͗̓̿̎̽̾̈́͗̈̊̐̈́̏̃̆͒͘͘̕̕͜͜͝ͅͅͅͅͅͅͅv̸̧̨̡̨̨̢̧̢̛̛̛̖̘̪͔̱̯̯̖͉͈̯̬̖̞͈͍̫̜̞̜͉͉̖͖̮̬̺̞̼̪̥̘̭̤̙̮͉̣̣̯̳̯͖̣̲̦͕͉̼̘̼̞̹̜͖̙̦͕͔̹̲͓̫͖̻̳̦̤̳͚͙̭̗̺̠̪̲͉̠̫͔̹̫̮̞͙͖͚̝͚͈̼̯͉͉̘̺̑͆̈́̎̑͌͒̾̔̄̈͌̑̅̋̎̍̊̃́͂̄̇̀̑̿̀̇͊͂͌̆̋̎́͂̏͊̑̈́̈́̽͐̊̀̃̀͑̈̒̈́̐̍̔̀̎̂̉͌͌͆̈́́͋͒̀̇͋͐̔͘̚̕̚͜͜͜͝͠͝͝͝͝͝͝ͅė̴̡̧̨̢̨̧̛̛̛̠̘͕͔̙͓͎̪̠̳͍̹̜̦͓̮̱̮͇̮͈͚͕̼͔͚̺̥͍͉̙̘̱̦̺̜̞̜̗̻͎̩̤̞̬̖̙̭͖̗͚͆͗̇͛̄̏́̿͆́̄͌͂̅͊͐̈́͐̈̀̑̅̆͛̽͑͛̉̈͋͑̈́͐͐͂̑̐̓̿͋͐͛̇͗̽̾͗͊̍͌͛̑̀̌̓̔̈͐̓̃̾̃̅͗̎̆̒͑̑̇̌̃̄̈́̔̎̅̇̄̂̔͒̐̐̓̆͌̃̆̈̓͂̿͌͒͐͌͊́̓̑̀̋́̄̈́̆͑̕̚̕̕̕̕̚̕̕̕̕̚͜͜͝͝͝͝͝͝͠͝͝ͅ ̶̧̡̨̢̢̧̨̧̨̡̧̢̧̨̨̢̧̧̢̡̧̡̡̱̪͍͎̦̝̗̬͖͚̳̤̖͎̟̫͙͕̺̜̝͚̺͓͎͔̟̜͍̯̗͖͚̟̣͔̻̟͈̝̗̳͖̦͈̬͕̱͈̳̣̼̭̟̠̜̦̘̗̝͕̮̟̠̣̹̭̜͍̭̱̭̖̭̦̖̜̝̭͔͕̹̰̼͕̪͇͍͕̭̣̝̟̹̥͔̭̯̼͎̘̤̩̲̠̭̙̘̙̺̹͉̲̩͔̰̬̯̘̫̝̦̖͇͔̙̯̭̤͇̥̻̤̽̑̔͌̐̊̓̀̈́̌͗͌̓͆̃̎͑̅̂͗͐͆̓̉̀̄̌̄̈́͗͆̊͛̊̈́̄̈́̅̐̉̄͋́̽̌̿̑́́̔͂́͋͆́̍̈́͆͋͂̽̀̿̎̾̊̉̄̒̅͆̈́̓̀̃͒̓͊͗̓̉͊͑̿̀̈̓̓̍͒̄̽̽̔͗̏̍̂̎́͛͐̑̈́͒͐͐́̅͊̀̓̄͑̆̔̓̃̏̊̽́̿͑̀̌̈́̕̕̕̕̕̚͘͘̕͜͜͜͝͝͝͝͠͝͝͝͝͝ͅͅͅͅͅc̴̡̢̨̢̛̭̲̹͖͙̲̬͖͕̪̗̳̱̫̰̪̺͖̝̹̰̋̍̅͂̈̒̊͂̈́̎̀͗̆̀̂̈́̄̄͆͋͆͂̿̾̏͋͗̅̔̆̇̓͂͗͆̓̎͆̌̒̓̅̽́͑͘̕͘̕̚͜͜͝͝͝͠͝͠ͅͅͅͅô̶̡̧̢̡̢̢̨̧̨̡̧̢̳͚̹̤͉̖̖̟̺͇̮͉͇͍̪̲̳̙͔̼̤̩̹̦͕̞͓̠̬̝̩͇̫̭̗̣̻̱̙̱̘͓̘̪̜̜̼̳̫͍̗̥̩̝͈͇͈͖͙̜͍̮̻̮̪̞̱̝͔̼̩̮̭̲̪̩̪͉̥̣͖̮͕͔̤̼̤̱͎͓͖͖̟̟͎̖̪̥̳̣̩̪͖̪̤͖͓̬̻̘͓̤̜̲̩̥͍̭̜͉̬̭͕͇̗͉̘̥͇̤͗̓̿̒̉̆̎̐͆͋̆́̀͑̿̓̌͗͊̈́̄͂̔̌͂̇͜͜͜͝͠ͅͅͅm̶̢̧̢̡̨̢̧̧̧̢̨̢̨̢̢̧̡̧̨̢̢̨̛͔͙̺̤͇̹̲̺̺̮̘̞̬̯̤̣̪̞̻̩̣̺̮̬͈͉̞̠͖͇͍͇̘̪̠̣͓̪̰̳͎̠̲̯̖̜̦̜̟̘̜̥̼̖͔̳͔̗̖̠͚̲̳̦̥̰͓̼͈͍̥̞͎͙̙̥͉̣̩̗̰̟̪̠̣͈͓͉͈̗͙͉̥͈̰̭̻͕̣͔͓̼̱̠̣͉̣̹̫̠̠͍̹͎̺͚̮̘̲͉̙͎̹̺͙͙͕̫̩̱̬̗̺̜͕̻̰̘̮̩̮͚̣̥͕̜͔̲͍̤̯̗̟̠̖͎̩̥̦͚̩͙͙͇̺̥͍̬̙̠̯̜̰͎͕̙̪͇̜͇͍̘̩̥͈͙͈̝̩͎̠͔̝͉̭̳̠̳̮̳̰̤̻̫̩̠̳͖͚̅̈͋͗̎̀͗̈́̈̓̏͂̈́̀͗̄̔̈́̊́̓͋̃͐͊͘͜͜͜͜͜͜͝͠͝ͅͅͅͅͅͅȩ̴̛̛̮̹̣̰̜̦̯̬̱̩̝̺̭̜̰̠̤̘̫͚͎̣̲̺̟̳͎͍̙̰͓̱̤̫͍̯̥͈͈͙̼͎̼̣͈̻̝̟̲͖͔̠͖͓̭̥͓̥̙͚̦͍̠͔̲͎̹͚̣̰̲́̎̂̆̑̅͋́̌́́̑͌͂̍̌̿̌́̐̀̿͒̈́̂̾̏̽̂̒͆̿̋̍̽͊̄͂̐́̆͆̀͗̐̋͒͑̆̈̓͊̿͂͑̽̓̈̚̚̕̕͜͜͜͜͝͝͝͝ͅ ̵̢̧̨̡̡̨̨̢̛̛͖̺̳̹̩͚͎̣̗̺̼͖̼͕̠̩̣̟̮̭̱̟̩͇̯̤̞͎̺̮̳͓̪̠̖̰͓̙̝̩̫͙̜̫̖̣̭̪̺̹̙͇̖̩̹̲̤̯͓͖͉̪̗̰̳̟̱̲̩̝̭̼͙̯͚͎͉͓̗̮̭̮̺̲̱̩͓̙̰̖͈̖̻͖͚͚̤͕͓͉̗͚͓̗̭̘̓́̽̊̇̇̑̂̑̏̆͑̐̍̈̄̑̀̋͛͂̓̽͊̈̍͒̉̉́̏̇̽͌̀̾̽̄̇͛̓̽̓͆̈́̃̓̿͂́͗̓̅̆́͗̽͊́̌͛̏̊̑̿͒̈̅̓̓̔͒̀̄͂̇̔̀́̈́̆̄̌̂̽̉͋̀̌͆̎̌͋͋͒̽̏́́̓͆̃̉͐̓̐͋͊͛̆̾̄̔͋̆̌̅̆́́̿̉̽̈́̈̽͛͐͗͐̐͐̑͌͊̍̌̀̈́̔̉̎̕͘͘͘̕̚͘͘̕̚͘͘͜͜͜͝͠͝͝͝͠͠͝͠͝͝͝͠͝͝ͅͅͅͅh̶̛̛̘̦̬̮͕̯͈͔́͒̓̍̿̃̇͑̀̐́͌̈́̈́̾͗̒͛̈͗̂̈͊́͋̀̋͂̀̀̓̏̈͊̆̃͒̊̈̉͌́̅̋̊̃̉̓́̒͐̀̌̓̑͊̔̏̎̐̈́͗͌͂͑̓̋̒͌͐̆͒͌͌́̋͊̅͌̄̏̚̕͘͘̕͘̚͘̕̚͝͝͝͠e̶̢̡̧̧̨̢̢̟̜͇̗̣̙̞̩͚̭̳̝͕͔̥͚̮̱͕̥̺̪͖̪̘̩̹͉̣̹͕̯͚͓͉̹̪̻͎̩̝̭̘͈̲̗̯̖̳̫̮̰̼̙̬͈͎̯̫̙̤̮̗̩̟̩̙͕͔̥̦̝͖̫͕̪̖̱͓͕̩̩̲̜̬̼̬͈͆̍͋͆͑̽͝ͅͅͅͅr̴̨̧̡̢̢̨̧̢̧̧̡̢̛̲̜̬͇̼͚̬̪̘͖̣̝͖͚̙̦͖̜̤͈̜͕̳͉̼̬͚̣̝̺̭̗̩̲͎͍̘͍̻͙͇̲̫̱͇͖͇̦̥̳̹͓͚̱̯̟͓̙̗͈̙͈̲̹͖̘̗̙̬̮̼̦͇̮͙̭̪̻͍̞̖͕̲̬̣̯̟̲̻͎͎͇͈̟̣̩̺͔̗͕̦̹̼̠̥̦͙͓̙̯̣̝̜̼̳̲̯̹̩̪̤͙̻͈̤̺̮̖͚̩̱͚̞̗͇͇͙͚͚̟̝̥̐̏́̈́̔̓̐̍̇͂̈́̈́͑͐̋̒̔̿̎͋̅̓͌̉́̓͂̔̔́̄̏̾̈́̈̏̐̅́̀͐̽͌͐̔̀̍̿̃̒͛̇̈̑̅͌̌̀͗̀̅͐͗̓͛͘̚̚̕͜͜͜͜͝͝͝͝͝͠͝͠ͅͅͅe̶̡̢̨̨̡̧̢̧̢̧̧̨̡̡̨̡̧̢̡̢̡̡̨̧̨̛̛̙͓̺̠̳͓̳͈̬͈̘̬̰̱̲̦̰̱̣͈̬̺̼̣̬̲͍̲̜͙̻̱͍̞̼͕͍̖̭̝͈̗̟̟̟͍̜̭̰̦̗̟͖̙̺͉̪͖͙͈̩̩͇̦̤̙̥̯̠̭̭͎̻̯̣̪̟̰̜͚̗̼̲͖̥͎̮̘̜̝̖̣̳̮͙̜̩̼̩̥͚͈͍̮̮̥͓͖̦̫̯̹̘̟͚̜̮̰͕̣͙̻̱̲͔͓̜̹̗͇͍͔̳̮̺̝̘̘̭̰͖̤̦͉̼̰̝͉̠̳̩̬̹̭̥͖̞̣̗̫̼̟̘͇̟͙̱̟̺̘̪̱̲͔͈̥̮̱̫͍̝̦̫̹͈͈̖̘̯̭̼̹̘̘̪̤̠͙̺̫̰̳̝̞̳͍̣͔̰̭͇̯̼̺̲̫̩̠̙̳̘͚͖̖̘͉̼̹͋̓́́̀̈͑̅̊́̐́̈̿̐͆́̓̈͗̑͛͌̿̊̊͆̑͂̋̈́̓̑͂͋͑͌̃̅̈̈́̅̐͒̈́̓̈́̿̀̄́͋͊̿̌̾́͊̀̈́̏͒͂́̂͛̀͆̍̄́̃̍̈́̑̂̅͑̊͋̓̔̈̉̍͂̈́̂̌̄̔̈́̏̏̒͐̂̓͊̀̀̀͆̍̏̆̇͊̄̈͗̌͊̈̋̇̄͌͛͒̅̓̐́̆̇̈́̔̑̀̾̑̍̎̂̋͛̉͋̿̅̍̈́͆̈̽̋́̽̈́͒͋̏͑͌̋͊̎̎̀̒̅̚̚͘̕̚͘͘͜͜͜͜͝͝͝͠͝͝͝͝ͅͅͅͅͅ ̸̨̨̧̢̨̧̨̢̧̢̡̨̢̨̨̡̡̨̡̢̧̨̡̡̨̨̧̛̛̛̛̭̬͚̺̪͓̻̙̲̠̺̠̞̠͖̲͇̞͉͕̳̲̖̣̺̣̱͕̱̭̫̻͔͈͙͉̥̭̠͈̥̖̦͇͙͖̗͇̼͚̥̮̩̯̜͔̗̯̮͕͖̳̖̻̹̟̘̞̤͍̪͙̻̗̼͙̩̪̯͉̝͕͈̤̰̫̙͙͍̻͖̣̤͖̤̯̫̠̯̪͇̱̤̥͔̥̦͙͍̤̻̮͉̱̼͕̟͕̩͈͙͓̩̦̹͙͓͎̼̼͎̠̣̝̗̫͎̫̥̞͉̭̞͙̣̭̗̰̬͙̜̗̫̻̞͎͇̝̪̘͔̗̳͓̰̝̱̩̳̫̺̝̟̯̩̭̖̯̺̤͚̙̯̮̗̝̠͇̳̹͙͍̥͙͍̣̣̳̪̗̫̙͇̗͕͕̜̘̟̩̻̺̫̪̥̦̠͙͓͔̹̳̗̗̳̗̰̝̗̹̙͇̱̘̝͕̼̯̙̰̜̻̜͙̝̥̳̫̬̭̩̓͋̔̾̀̌̓̽͋̈́̐͒̈́́̀̋̏̋̐̈́͋́̊̌̃̓̄̉̔̆̉̓͑̈́́͋̈̍͗̐́͂͒͐͑̔̃̓̿̈̑͗̍̆͑͆͛͐̑̑͊̽̽̉̑͑̄̍͋͌̈́̽̓̽̽̌̒͂͌̅̈́̇̍͑̏̅̀̔̍́͋̀̉̒͌̍͋͛̾̈́͋̉̂̆̄̍͑͋̇͊̀̄̆̏́̔̆̐̏̐̈̾̎͐̀̅̿͆͑́̉̏̄͛̈́̓̍̈́͗̃͑́̏̓̓̽̅̌͗̇̓͒̌͛̓̋̏͐͋̈̏̃̓̌͂̋̈́͋̈́͐̂̃̽̓̂̽̍͗̈̌̄̑̆͋̒͗͊̔̔̎̿͂̆͐̓͋̈̉͌̽̎̈̑̆̉̀͑̑̀̅̑͑̓̄̐̍̎̎̏̊̂̎̈́͌̆̂̈̒̅͌̍̔̓̀͂͆̌̅̈̚͘̚̚̕̕͘̚͘̚̚̚̕͘͘̚͘̚̚͜͝͝͝͝͝͠͠͝͠͝͠͝͠͠͠͠͝͝͝ͅͅͅͅͅͅͅͅͅ ̶̨̢̡̛̤̞̱̠̱̻̗̱̗͉̳̲͚̰̻̥̗̝̥̺̲͕̗͓̰̫͈̖̠̮̮̭͉̿͑̉̌̎̈̈́͂̈̌͌̃͆͛̔͐͋̓̄̓̽́̿̊͊͌̒̓̒̒̅̈̀̈́̉̀̏̔̊͛̿̐̈̓̐̋̔͒͊́̈́̈́͛̉̓̀̓̉͛̑̿̐͑̏̈́̓͌́̒͒̋̀͐̓̓̔̍̀͐̚̕͘̚͜͝͠͝͠͠͠͠͠');
