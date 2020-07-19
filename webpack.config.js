@@ -1,22 +1,17 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { SourceMapDevToolPlugin } = require('webpack');
 
 module.exports = {
   entry: './src/index.js',
   output: {
-    path: __dirname + '__dirname',
+    path: __dirname,
     filename: 'index_bundle.js'
   },
-
   mode: 'development',
-  plugins:[
-    new SourceMapDevToolPlugin({
-      filename: '[file].map'
-    }),
-
+  plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
-    })],
+    })
+  ],
   module: {
     rules: [
       {
