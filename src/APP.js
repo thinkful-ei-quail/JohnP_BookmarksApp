@@ -75,22 +75,22 @@ const generateAddBookmark = function () {
             <form id="add-bookmark-form" class="">
                 <div class="addform flexdaddy" >
                     <label for="new-bookmark-title" class="flexkid">Add New Site:</label>
-                    <input type="text" name="new-bookmark-title" class="bookmark-title new-site-name flexkid"
+                    <input type="text" name="new-bookmark-title" class="bookmark-title new-site-name flexkid" id="new-bookmark-title"
                     placeholder="Enter Site Name" required>
                 </div>
                 <div class="addform flexdaddy">
                   <label for="new-bookmark-url" class="flexkid">URL ('https://' is required):</label>
-                  <input type="url" name="new-bookmark-url" class="form-control new-site-url flexkid" placeholder="http(s)://"
+                  <input type="url" name="new-bookmark-url" class="form-control new-site-url flexkid" placeholder="http(s)://" id="new-bookmark-url"
                   required>
                 </div>
                 <div class="addform flexdaddy">
                    <label for="new-bookmark-description" class="flexkid">Add a description:</label>
-                    <input type="text" name="new-bookmark-description" class="form-control new-site-desc flexkid"
+                    <input type="text" name="new-bookmark-description" class="form-control new-site-desc flexkid" id="new-bookmark-description"
                     placeholder="Enter a description..." required>
                 </div>
                 <div class="rate-new flexdaddy">
                   <label for="new-rating" class="flexkid">Rating:</label>
-                  <select name="new-rating" class="new-site-rating flexkid">
+                  <select name="new-rating" class="new-site-rating flexkid" id="new-rating">
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -153,7 +153,7 @@ const generateBookmarkList = function (bookmarks) {
     });
     return `
             <div class="bookmark-wrapper">
-                ${bookmarkListItems.join("")}
+                ${bookmarkListItems.join('')}
             </div>`;
 };
 
@@ -173,6 +173,7 @@ const renderError = function () {
 const renderMain = function () {
     console.log(`renderMain started`);
     console.log('Rendering Page');
+    renderError();
     generateHome();
     generateFilter();
     if(store.state.adding){
@@ -218,8 +219,8 @@ const handleAddStart = function () {
 };
 
 const handleAddBookMarkSubmit = function () {
-    console.log(`handleAddBookMarkSubmit started`);
     $('main').submit('.add-bookmark-submit', function (event) {
+        event.preventDefault();
         store.state.error = null;
         store.state.adding=!store.state.adding;
         const newBookmark = {};
@@ -231,13 +232,14 @@ const handleAddBookMarkSubmit = function () {
         api.postNewBookmark(newBookmark)
             .then((data) => {
                 store.bookmarkStorePush(data);
+
                 renderMain();
             })
             .catch((error) => {
                 store.setError(error.message);
                 renderError();
                 renderMain();
-            });
+            })
     });
 };
 

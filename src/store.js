@@ -22,12 +22,11 @@ const addNewBook = function (bookmark) {
     this.bookmarks.push(bookmark);
    };
 
-const bookmarkStorePush = function (bookmarks) {
-    this.bookmarks=bookmarks.map((bookmark) => {
+const bookmarkStorePush = function (bookmark) {
     bookmark.display=true;
     bookmark.expanded=false;
-    return bookmark;
-    });
+    this.bookmarks.push(bookmark);
+
 };
 
 const toggleExpanded = function (object) {
