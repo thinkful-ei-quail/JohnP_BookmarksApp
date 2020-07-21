@@ -232,7 +232,6 @@ const handleAddBookMarkSubmit = function () {
         api.postNewBookmark(newBookmark)
             .then((data) => {
                 store.bookmarkStorePush(data);
-
                 renderMain();
             })
             .catch((error) => {

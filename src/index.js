@@ -11,11 +11,13 @@
 
 const main = function () {
     console.log('startPage ran');
-    api.getBookmarks().then((bookmarks) => {
-        store.bookmarkStorePush(bookmarks);
+    api.getBookmarks()
+    .then(bookmarks => {
+        bookmarks.forEach(bookmark=>store.bookmarkStorePush(bookmark));
         APP.renderMain();
-        APP.bindEventListeners();
     });
+    APP.bindEventListeners();
+    APP.renderMain();
   };
 
   $(main());

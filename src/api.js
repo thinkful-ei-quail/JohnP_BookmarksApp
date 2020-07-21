@@ -22,16 +22,14 @@ const fetchViaAsyncAwait = async function(...args){
         return error.message;
     };
 };
+
+
  const getBookmarks = function () {
      return fetchViaAsyncAwait(`${store.state.BASE_URL}`);
 };
 
 const postNewBookmark = function (newBookmark) {
     console.log("API firing")
-    if(newBookmark.desc ===''){
-    newBookmark.desc ="don't forget to add a description here"};
-    if(newBookmark.rating === null){
-    newBookmark.rating = 5;}
     newBookmark=JSON.stringify(newBookmark);
     console.log(`New Bookmark to post is${newBookmark}`);
      return fetchViaAsyncAwait(`${store.state.BASE_URL}`, {
