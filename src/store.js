@@ -51,7 +51,7 @@ const findAndEdit = function (id, newData){
   };
 
 const setError = function (error){
-    state.error=error;
+    this.state.error=error;
 };
 
 const rateTest = function (){

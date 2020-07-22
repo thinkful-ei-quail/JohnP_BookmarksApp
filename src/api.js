@@ -11,17 +11,27 @@ import store from './store';
 //const fetch//Something// = async function (){};
 
 const fetchViaAsyncAwait = async function(...args){
-    try{
-        const responseOne = await  fetch(...args);
-        const data = await responseOne.json();
-        console.log('fetchViaAsyncAwait ran');
+    let error = null;
+    return fetch(...args)
+      .then(res => {
+        if (!res.ok) {
+          error = {code: res.status};
+
+          if (!res.headers.get('content-type').includes('json')) {
+            error.message = res.statusText;
+            return Promise.reject(error);
+          }
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (error) {
+          error.message = data.message;
+          return Promise.reject(error);
+        }
         return data;
-    }
-    catch (error){
-        console.log(error.message);
-        return error.message;
-    };
-};
+      });
+  };
 
 
  const getBookmarks = function () {
