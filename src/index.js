@@ -10,12 +10,12 @@
  import APP from './APP';
 
 const main = function () {
-    console.log('startPage ran');
     api.getBookmarks()
     .then(bookmarks => {
         bookmarks.forEach(bookmark=>store.bookmarkStorePush(bookmark));
         APP.renderMain();
     });
+    APP.renderError();
     APP.bindEventListeners();
     APP.renderMain();
   };
